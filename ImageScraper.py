@@ -113,8 +113,8 @@ if __name__ == '__main__':
 	if(len(sys.argv)>4 and len(sys.argv) == 8):
 		try:
 			Scraper.boundary=(int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]),int(sys.argv[7]))
-		except:
-			print("Boundary values must be integers.")
+		except ValueError as e:
+			print(e)
 			sys.exit(1)
 	elif(len(sys.argv)>4 and len(sys.argv)!=8):
 		print("Usage: python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1] [boundary 2] [boundary 3] [boundary 4]")
