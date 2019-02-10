@@ -5,10 +5,9 @@
 	Example:
 		$python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1] [boundary 2] [boundary 3] [boundary 4]
 """
-import PIL
 import os
 import sys
-from PIL import ImageGrab
+import pyscreenshot as ImageGrab
 import time
 class ImageScraper(object):
 	"""
@@ -18,7 +17,7 @@ class ImageScraper(object):
 			path (str): The name of the output path 
 			boundary (:obj:4-tuple of :obj:int): a 4-tuple of integer values that represent the boundary box of the screenshot
 	"""
-	def __init__(self,imageCount,fileName="screenshot",path="./images",boundary=()):
+	def __init__(self,imageCount,fileName="Screenshot",path="./Screenshots",boundary=()):
 		self.__imageCount = imageCount
 		self.__fileName = fileName
 		self.__boundary = boundary
