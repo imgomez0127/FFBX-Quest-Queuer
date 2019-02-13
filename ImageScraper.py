@@ -8,7 +8,6 @@
 import os
 import sys
 import pyscreenshot as ImageGrab
-import time
 class ImageScraper(object):
 	"""
 		Args:

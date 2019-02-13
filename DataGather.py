@@ -2,7 +2,8 @@ import os
 import re
 import subprocess
 import sys
-import ImageScraper
+import time
+from ImageScraper import ImageScraper
 
 class ImageGather(object):
 	def __init__(self,timeFrame,OS="linux"):
@@ -31,7 +32,9 @@ class ImageGather(object):
 
 	def gatherData(self):
 		autobox_boundary = self.findBoundary("autobox")
-		return autobox_boundary
+		autobox_scraper = ImageScraper(self.__timeFrame,"autoboxPos","./autoboxPosExamples",autobox_boundary)
+		autobox_scraper.takeScreenshots()
+		print(autobox_boundary)
 if __name__ == "__main__":
 	if(len(sys.argv) < 2 or len(sys.argv) > 3):
 		print("Usage: python DataGather.py <timeFrame> [Operating System]")
@@ -39,6 +42,6 @@ if __name__ == "__main__":
 	if(len(sys.argv) == 2):
 		Gatherer = ImageGather(sys.argv[1])
 	else:
-		Gatherer = ImageGather(sys.argv[1],sys.argv[2])
+		Gatherer = ImageGather(int(sys.argv[1]),sys.argv[2])
 	print(Gatherer.gatherData())
 	
