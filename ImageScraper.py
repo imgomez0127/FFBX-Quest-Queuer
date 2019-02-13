@@ -88,7 +88,10 @@ class ImageScraper(object):
 			in a jpg format and outputs it to the  given filePath
 		"""
 		for i in range(self.__imageCount):
-			screenshot = ImageGrab.grab(self.__boundary)
+			if(self.__boundary != ()):
+				screenshot = ImageGrab.grab(self.__boundary)
+			else:
+				screenshot = ImageGrab.grab()
 			filePath = ""
 			if(self.__path[0] != "."):
 				filePath += "."
@@ -97,7 +100,7 @@ class ImageScraper(object):
 			else:
 				filePath += self.__path+'/' + self.__fileName + str(i) + ".jpg"
 			screenshot.save(filePath)
-			time.sleep(1)
+
 
 if __name__ == '__main__':
 	if(len(sys.argv)<2 or len(sys.argv) > 8):
