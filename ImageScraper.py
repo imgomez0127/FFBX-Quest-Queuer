@@ -94,6 +94,8 @@ class ImageScraper(object):
 			filePath = ""
 			if(self.__path[0] != "."):
 				filePath += "."
+			if(self.__path[1] != "/"):
+				filePath += "/"
 			if(self.__path[-1] == "/"):
 				filePath += self.__path + self.__fileName + str(i+1) + ".jpg"
 			else:

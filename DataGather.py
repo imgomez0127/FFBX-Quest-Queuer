@@ -29,12 +29,37 @@ class ImageGather(object):
 		if(bbox == ""):
 			raise ValueError("Could not find boundary in the box-sizes.cfg file")
 		return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
-
 	def gatherData(self):
+		runProgram = True
+		while(runProgram):
+			menu = """A - Fetch Auto Box Pictures
+Q - Fetch Quest Box Pictures
+N - Fetch Next Box Pictures
+Please Input a choice : """
+			choices = ['a','q','n']
+			screenshotType = input(menu).lower()
+			while(screenshotType not in choices):
+				print("This is not a valid choce \n\n")	
+				screenshotType = input(menu).lower()	
+			if(screenshotType == "a"):
+				self.screenshotAutobox()
+			elif(screenshotType == 'q'):
+				self.screenshotQuestbox()
+			else:
+				self.screenshotNextbox()
+			runProgram = (input("Would you like to gather more screenshots [y/n]: ").lower() == "y")
+				
+	def screenshotQuestbox(self):
+		questbox_boundary = self.findBoundary("questbox")
+		imageScraper = ImageScraper(self.__timeFrame,"questboxPos","questboxPosExamples",questbox_boundary)
+		imageScraper.takeScreenshots()
+	def screenshotAutobox(self):
 		autobox_boundary = self.findBoundary("autobox")
-		autobox_scraper = ImageScraper(self.__timeFrame,"autoboxPos","./autoboxPosExamples",autobox_boundary)
-		autobox_scraper.takeScreenshots()
-		print(autobox_boundary)
+		imageScraper = ImageScraper(self.__timeFrame,"autoboxPos","autoboxPosExamples",autobox_boundary)
+		imageScraper.takeScreenshots()	
+	def screenshotNextbox(self):
+		nextbox_boundar = self.findBoundary("nextbox")
+		imageScraper = ImageScraper(self.__timeFrame,"autoboxPos","autoboxPosExamples",autobox_boundary)
 if __name__ == "__main__":
 	if(len(sys.argv) < 2 or len(sys.argv) > 3):
 		print("Usage: python DataGather.py <timeFrame> [Operating System]")
@@ -43,5 +68,4 @@ if __name__ == "__main__":
 		Gatherer = ImageGather(sys.argv[1])
 	else:
 		Gatherer = ImageGather(int(sys.argv[1]),sys.argv[2])
-	print(Gatherer.gatherData())
-	
+	Gatherer.gatherData()	
