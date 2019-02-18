@@ -1,8 +1,6 @@
 import os
-import re
 import subprocess
 import sys
-import time
 from ImageScraper import ImageScraper
 
 class ImageGather(object):
@@ -21,7 +19,6 @@ class ImageGather(object):
 	@timeFrame.setter
 	def timeFrame(self,timeFrame):
 		self.__timeFrame = timeFrame
-
 	def findBoundary(self,boundaryName):
 		bboxSetting = "[" + self.__OS.lower() + "-" + boundaryName + "-" + self.__resolution + "]"
 		f = open("box-sizes/box-sizes.cfg","r")	
