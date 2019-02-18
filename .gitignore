@@ -3,8 +3,7 @@
 *.com
 *.class
 *.dll
-*.exe
-*.o
+*.exe *.o
 *.so
 
 # Packages #
@@ -42,3 +41,6 @@ Screenshots/
 __pycache__/
 questboxPosExamples/
 autoboxPosExamples/
+departboxPosExamples
+nextboxPosExamples
+companionboxPosExamples/

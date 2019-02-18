@@ -101,7 +101,8 @@ class ImageScraper(object):
 			else:
 				filePath += self.__path+'/' + self.__fileName + str(i) + ".jpg"
 			screenshot.save(filePath)
-
+	def getImage(self):
+		return ImageGrab.grab()
 
 if __name__ == '__main__':
 	if(len(sys.argv)<2 or len(sys.argv) > 8):
