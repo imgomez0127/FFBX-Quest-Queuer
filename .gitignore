@@ -41,6 +41,8 @@ Screenshots/
 __pycache__/
 questboxPosExamples/
 autoboxPosExamples/
-departboxPosExamples
-nextboxPosExamples
+departboxPosExamples/
+nextboxPosExamples/
 companionboxPosExamples/
+autoboxNegExamples/
+requestboxPosExamples/

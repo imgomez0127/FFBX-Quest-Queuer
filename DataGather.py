@@ -32,55 +32,45 @@ class ImageGather(object):
 		return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
 	def gatherData(self):
 		runProgram = True
+		PosExampleFlag = True
 		while(runProgram):
 			menu = """A - Fetch Auto Box Pictures
 Q - Fetch Quest Box Pictures
 N - Fetch Next Box Pictures
 C - Fetch Companion Box Pictures
 D - Fetch Depart Box Pictures
+R - Fetch Request Box Pictures
+S - Set Positive Example Flag
 Please Input a choice : """
-			choices = ['a','q','n','c','d']
+			choices = ['a','q','n','c','d','r','s']
+			boxtype = {'a':"autobox",'q':"questbox",'n':"nextbox",'c':"companionbox",'d':"departbox",'r':"requestbox"}
 			screenshotType = input(menu).lower()
 			while(screenshotType not in choices):
 				print("This is not a valid choce \n\n")	
 				screenshotType = input(menu).lower()	
 			if(screenshotType == "a"):
-				self.screenshotAutobox()
+				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
 			elif(screenshotType == 'q'):
-				self.screenshotQuestbox()
+				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
 			elif(screenshotType == 'n'):
-				self.screenshotNextbox()
+				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
 			elif(screenshotType == 'c'):
-				self.screenshotCompanionbox()
+				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
 			elif(screenshotType == 'd'):
-				self.screenshotDepartbox()
+				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
+			elif(screenshotType == 'r'):
+				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
+			elif(screenshotType == 's'):
+				PosExampleFlag = True if(input("Set flag to [T/F]: ").lower() == "t") else False	
+				print(PosExampleFlag)
 			else:
 				continue
 			runProgram = (input("Would you like to gather more screenshots [y/n]: ").lower() == "y")
-				
-	def screenshotQuestbox(self):
-		questbox_boundary = self.findBoundary("questbox")
-		imageScraper = ImageScraper(self.__timeFrame,"questboxPos","questboxPosExamples",questbox_boundary)
-		imageScraper.takeScreenshots()
-
-	def screenshotAutobox(self):
-		autobox_boundary = self.findBoundary("autobox")
-		imageScraper = ImageScraper(self.__timeFrame,"autoboxPos","autoboxPosExamples",autobox_boundary)
-		imageScraper.takeScreenshots()
-
-	def screenshotNextbox(self):
-		nextbox_boundary = self.findBoundary("nextbox")
-		imageScraper = ImageScraper(self.__timeFrame,"nextboxPos","nextboxPosExamples",nextbox_boundary)
-		imageScraper.takeScreenshots()
-
-	def screenshotCompanionbox(self):
-		companionbox_boundary = self.findBoundary("companionbox")
-		imageScraper = ImageScraper(self.__timeFrame,"companionboxPos","companionboxPosExamples",companionbox_boundary)
-		imageScraper.takeScreenshots()
-
-	def screenshotDepartbox(self):
-		departbox_boundary = self.findBoundary("departbox")
-		imageScraper = ImageScraper(self.__timeFrame,"departboxPos","departboxPosExamples",departbox_boundary)
+	def screenshotbox(self,PosExampleFlag,boxtype):
+		box_boundary = self.findBoundary(boxtype)
+		fileName = boxtype + ("Pos" if (PosExampleFlag) else "Neg")
+		path = boxtype + ("Pos" if (PosExampleFlag) else "Neg") + "Examples"
+		imageScraper = ImageScraper(self.__timeFrame,fileName,path,box_boundary)
 		imageScraper.takeScreenshots()
 
 if __name__ == "__main__":
