@@ -1,9 +1,25 @@
+"""
+	A python script to automate the data gathering process for building the Convolutional
+	Neural Network. It works by prompting the user what type of image they want to screenshot
+	And then gathers the bounding boxes from the box-sizes.cfg file. It then takes the screenshot,
+	and labels it based on the given type of screenshot and labels they type, and whether it is 
+	a positive or negative example
+
+	Example:
+		$pyhton DataGather.py <timeFrame> [Operating System]
+"""
 import os
 import subprocess
 import sys
 from ImageScraper import ImageScraper
 
 class ImageGather(object):
+	"""
+		Args:
+			timeFrame(int): The time frame for which the Images should be screenshotted
+			usually taking one picture per second			
+			OS(str): The current operating system the user is using
+	"""
 	@staticmethod
 	def getResolution():
 		"""
@@ -89,21 +105,10 @@ Please Input a choice : """
 			while(screenshotType not in choices):
 				print("This is not a valid choce \n\n")	
 				screenshotType = input(menu).lower()	
-			if(screenshotType == "a"):
-				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
-			elif(screenshotType == 'q'):
-				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
-			elif(screenshotType == 'n'):
-				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
-			elif(screenshotType == 'c'):
-				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
-			elif(screenshotType == 'd'):
-				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
-			elif(screenshotType == 'r'):
-				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
-			elif(screenshotType == 's'):
+			if(screenshotType == 's'):
 				PosExampleFlag = True if(input("Set flag to [T/F]: ").lower() == "t") else False	
-				print(PosExampleFlag)
+			elif(screenshotType in choices):
+				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
 			else:
 				continue
 			runProgram = (input("Would you like to gather more screenshots [y/n]: ").lower() == "y")
@@ -111,11 +116,15 @@ Please Input a choice : """
 	def screenshotbox(self,PosExampleFlag,boxtype):
 		"""
 			Args:
-				PosExampleFlag (bool): A flag which represents whether the screenshot is a positive or negative example
-				boxtype (str): A string which indicates what type of box is being screenshoted
+				PosExampleFlag (bool): A flag which represents whether the screenshot 
+									   is a positive or negative example
+				boxtype (str): A string which indicates 
+							   what type of box is being screenshoted
 			
-			This function takes a screenshot of the indicated box and saves it in the respective folder location.
-			Indicating whether or not it is a Positive or Negative example (as indicated by the user)
+			This function takes a screenshot of the indicated box 
+			and saves it in the respective folder location.
+			Indicating whether or not it is a Positive 
+			or Negative example (as indicated by the user)
 			for ease of data labelling
 		"""
 		box_boundary = self.findBoundary(boxtype)
