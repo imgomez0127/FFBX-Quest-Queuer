@@ -39,10 +39,9 @@ Thumbs.db
 venv/
 Screenshots/
 __pycache__/
-questboxPosExamples/
-autoboxPosExamples/
-departboxPosExamples/
-nextboxPosExamples/
-companionboxPosExamples/
-autoboxNegExamples/
-requestboxPosExamples/
+questboxExamples/
+autoboxExamples/
+departboxExamples/
+nextboxExamples/
+companionboxExamples/
+requestboxExamples/

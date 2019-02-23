@@ -3,9 +3,11 @@
 	which will be used to feed into the Convolutional Neural Network
 
 	Example:
-		$python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1] [boundary 2] [boundary 3] [boundary 4]
+		$python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1]
+[boundary 2] [boundary 3] [boundary 4]
 """
 import os
+import re
 import sys
 import pyscreenshot as ImageGrab
 class ImageScraper(object):
@@ -14,7 +16,8 @@ class ImageScraper(object):
 			imageCount (int): The amount of images that should be taken
 			fileName (str): The name of the output file
 			path (str): The name of the output path 
-			boundary (:obj:4-tuple of :obj:int): a 4-tuple of integer values that represent the boundary box of the screenshot
+			boundary (:obj:4-tuple of :obj:int): a 4-tuple of integer values 
+			that represent the boundary box of the screenshot
 	"""
 	def __init__(self,imageCount,fileName="Screenshot",path="./Screenshots",boundary=()):
 		self.__imageCount = imageCount
@@ -79,16 +82,26 @@ class ImageScraper(object):
 			if(not isinstance(val,int)):
 				raise ValueError("The boundary take in 4 integer inputs")
 		self.__boundary = boundary
+	def __getRecentScreenshot(self,path):
+		regex = re.compile("[0-9]+")
+		imgLst = os.listdir(path)
+		if len(imgLst) == 0:
+			return 0
+		intLst = [int(regex.findall(im)[0]) for im in imgLst]
+		return max(intLst)+1
 
 	def takeScreenshots(self):
 		"""
 			This function takes an screenshot for the range 0-imageCount
-			screenshots the given boundary every 1 second and saves it with the given fileName 
-			in a jpg format and outputs it to the  given filePath
+			screenshots the given boundary every 1 second and saves it with 
+			the given fileName in a jpg format and outputs it to the 
+			given filePath
 		"""
+		recentScreenshot = self.__getRecentScreenshot(self.path)
 		for i in range(self.__imageCount):
+			screenshotNum = str(i+recentScreenshot)
 			if(self.__boundary != ()):
-				screenshot = ImageGrab.grab(self.__boundary)
+				screenshot = ImageGrab.grab(self.boundary)
 			else:
 				screenshot = ImageGrab.grab()
 			filePath = ""
@@ -97,9 +110,9 @@ class ImageScraper(object):
 			if(self.__path[1] != "/"):
 				filePath += "/"
 			if(self.__path[-1] == "/"):
-				filePath += self.__path + self.__fileName + str(i) + ".jpg"
+				filePath += self.path + self.fileName + screenshotNum + ".jpg"
 			else:
-				filePath += self.__path+'/' + self.__fileName + str(i) + ".jpg"
+				filePath += self.path +'/' + self.__fileName + screenshotNum + ".jpg"
 			screenshot.save(filePath)
 	def getImage(self):
 		return ImageGrab.grab()

@@ -1,12 +1,8 @@
 """
-	A python script to automate the data gathering process for building the Convolutional
-	Neural Network. It works by prompting the user what type of image they want to screenshot
-	And then gathers the bounding boxes from the box-sizes.cfg file. It then takes the screenshot,
-	and labels it based on the given type of screenshot and labels they type, and whether it is 
-	a positive or negative example
-
+	A python script to automate the image gathering process for building the Convolutional
+	Neural Network. 
 	Example:
-		$pyhton DataGather.py <timeFrame> [Operating System]
+		$pyhton ImageGather.py <timeFrame> [Operating System]
 """
 import os
 import subprocess
@@ -18,21 +14,18 @@ class ImageGather(object):
 		Args:
 			timeFrame(int): The time frame for which the Images should be screenshotted
 			usually taking one picture per second			
+
 			OS(str): The current operating system the user is using
 	"""
 	@staticmethod
-	def getResolution():
-		"""
-			This function uses a full screenshot from the ImageScraper to
-			get the screen resolution
-		"""	
+	def determineResolution():
 		bbox = ImageScraper(1).getImage().getbbox()  
 		return str(bbox[2]) + "x" + str(bbox[3]) 
 
 	def __init__(self,timeFrame,OS="linux"):
 		self.__timeFrame = timeFrame
 		self.__OS = OS.strip()
-		self.__resolution = ImageGather.getResolution()
+		self.__resolution = ImageGather.determineResolution()
 
 	@property
 	def timeFrame(self):
@@ -57,18 +50,14 @@ class ImageGather(object):
 		#The screen resolution of the current computer
 		return self.__resolution
 
-	@resolution.setter
-	def resolution(self,resolution):
-		self.__resolution = resolution
-
 	def findBoundary(self,boundaryName):
 		"""
 			Args:	
-				boundaryName (str): The name of the boundary box that is being searched for 
-			
-			This function takes in an input of a bounday box name and outputs the respective
-			4-tuple of the bounding box in pixles. This bounding box is contained in 
-			box-sizes/box-sizes.cfg
+				boundaryName (str): The name of the boundary box that 
+				is being searched for 
+
+			Returns:
+				boundrybox (4-tuple of ints)		
 		"""
 		bboxSetting = "[" + self.__OS.lower() + "-" + boundaryName + "-" + self.__resolution + "]"
 		f = open("box-sizes/box-sizes.cfg","r")	
@@ -80,16 +69,11 @@ class ImageGather(object):
 		if(bbox == ""):
 			raise ValueError("Could not find boundary in the box-sizes.cfg file")
 		return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
-
+	
 	def gatherData(self):
-		"""
-			This function proccesses the commands for which screenshots to take.
-			This is done by prompting the user with a menu, for which they respond which pictures they want to take.
-			They are also allowed to choose whether or not it should be labeled as a positive or negative example.
-			Finally they are prompted whether they want to take more screenshots and if not the program exits.
-		"""
+		#This function proccesses the commands for which screenshots to take.
 		runProgram = True
-		PosExampleFlag = True
+		PosExample = True
 		while(runProgram):
 			menu = """A - Fetch Auto Box Pictures
 Q - Fetch Quest Box Pictures
@@ -100,42 +84,46 @@ R - Fetch Request Box Pictures
 S - Set Positive Example Flag
 Please Input a choice : """
 			choices = ['a','q','n','c','d','r','s']
-			boxtype = {'a':"autobox",'q':"questbox",'n':"nextbox",'c':"companionbox",'d':"departbox",'r':"requestbox"}
+			boxtype = {'a':"autobox",
+					   'q':"questbox",
+					   'n':"nextbox",
+					   'c':"companionbox",
+					   'd':"departbox",
+					   'r':"requestbox"}
 			screenshotType = input(menu).lower()
 			while(screenshotType not in choices):
 				print("This is not a valid choce \n\n")	
 				screenshotType = input(menu).lower()	
 			if(screenshotType == 's'):
-				PosExampleFlag = True if(input("Set flag to [T/F]: ").lower() == "t") else False	
+				PosExample = True if(input("Set flag to [T/F]: ").lower() == "t") \
+				else False	
 			elif(screenshotType in choices):
-				self.screenshotbox(PosExampleFlag,boxtype[screenshotType])
+				self.gatherScreenshots(PosExample,boxtype[screenshotType])
 			else:
 				continue
-			runProgram = (input("Would you like to gather more screenshots [y/n]: ").lower() == "y")
-
-	def screenshotbox(self,PosExampleFlag,boxtype):
+			runProgram = input("Would you like to gather more screenshots [y/n]: ").lower() == "y"
+	
+	def gatherScreenshots(self,PosExample,boxtype):
 		"""
 			Args:
-				PosExampleFlag (bool): A flag which represents whether the screenshot 
-									   is a positive or negative example
+				PosExample (bool): positive or negative example
 				boxtype (str): A string which indicates 
 							   what type of box is being screenshoted
 			
 			This function takes a screenshot of the indicated box 
-			and saves it in the respective folder location.
-			Indicating whether or not it is a Positive 
-			or Negative example (as indicated by the user)
-			for ease of data labelling
+			and saves it in the respective folder location. Indicating whether 
+			or not it is a Positive or Negative example 
+			(as indicated by the user) for ease of data labelling
 		"""
-		box_boundary = self.findBoundary(boxtype)
-		fileName = boxtype + ("Pos" if (PosExampleFlag) else "Neg")
-		path = boxtype + ("Pos" if (PosExampleFlag) else "Neg") + "Examples"
-		imageScraper = ImageScraper(self.__timeFrame,fileName,path,box_boundary)
+		boundary = self.findBoundary(boxtype)
+		fileName = boxtype + ("Pos" if (PosExample) else "Neg")
+		path = boxtype + "Examples"
+		imageScraper = ImageScraper(self.__timeFrame,fileName,path,boundary)
 		imageScraper.takeScreenshots()
 
 if __name__ == "__main__":
 	if(len(sys.argv) < 2 or len(sys.argv) > 3):
-		print("Usage: python DataGather.py <timeFrame> [Operating System]")
+		print("Usage: python ImageGather.py <timeFrame> [Operating System]")
 		sys.exit(1)
 	if(len(sys.argv) == 2):
 		Gatherer = ImageGather(sys.argv[1])
