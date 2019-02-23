@@ -17,28 +17,33 @@ class ImageProcessor(object):
 			be pulled from
 	"""	
 	def __init__(self,folderPath = "./Screenshots"):
-		if(os.path.isdir("./Screenshots")):
+		if(os.path.isdir(folderPath)):
 			self.__folderPath = folderPath
 		else:
 			errMessage = "The input path is not a valid path folder path"
 			raise NotADirectoryError(errMessage) 
 		self.__processedImages = []
 		self.__imageClasses = []
+
 	@property
 	def folderPath(self):
 		#folder path to process images from
 		return self.__folderPath
+
 	@folderPath.setter
 	def folderPath(self,newPath):
 		self.__folderPath = newPath
+
 	@property
 	def processedImages(self):	
 		#A list of processed images
 		return self.__processdImages
+
 	@processedImages.setter
 	def processedImages(self,newImageLst):
 		self.__processedImages = newImageLst
-	def ImageToArray(self,imagePath):
+
+	def __ImageToArray(self,imagePath):
 		"""
 			Args:
 				imagePath(str): The path to the image that 
@@ -51,6 +56,7 @@ class ImageProcessor(object):
 		imArr = np.asarray(im)
 		im.close()
 		return imArr	
+
 	def processFolderImages(self):
 		"""
 			This function selects the folderPath memeber variable and 
@@ -60,17 +66,19 @@ class ImageProcessor(object):
 		fileList = os.listdir(self.__folderPath)
 		for fileName in fileList:
 			try:
-				imgAsArr = self.ImageToArray(self.__folderPath + "/" + fileName)
+				fullImagePath = self.__folderPath + "/" + fileName
+				imgAsArr = self.__ImageToArray(fullImagePath)
 				self.__processedImages.append(imgAsArr) 
-				self.__imageClasses.append(self.classifyImages(fileName))
+				self.__imageClasses.append(self.__classifyImages(fileName))
 			except OSError:
 				continue
 		return self.__processedImages
 
-	def classifyImages(self,imagePath):
+	def __classifyImages(self,fileName):
 		regexPos = re.compile("(Pos)+")	
-		return 1 if (regex.findall(fileName) != []) else 0 
+		return 1 if (regexPos.findall(fileName) != []) else 0 
 
 if __name__ == "__main__":
-	imgProc = ImageProcessor()
-	print(imgProc.processFolderImages())
+	imgProc = ImageProcessor("autoboxExamples")
+	print(len(os.listdir("autoboxExamples")))
+	print(np.shape(imgProc.processFolderImages()[0]))

@@ -15,6 +15,8 @@ class ConvNet(keras.Sequential):
 		self.__convAmt = convAmt
 		self.__hiddenLayers = hiddenLayers
 		self.__imageSize = 0
+		self.__filePath = "./" + self.__boxname + "Examples"
+		self.__images = self.__processImages()
 
 	@property
 	def boxname(self):
@@ -36,4 +38,31 @@ class ConvNet(keras.Sequential):
 	def hiddenLayers(self,hiddenLayers):
 		self.__hiddenLayers = hiddenLayers
 	
+	@property
+	def imageSize(self):
+		return self.__imageSize
 	
+	@imageSize.setter
+	def imageSize(self,imageSize):
+		self.__imageSize = imageSize
+	
+	@property
+	def filePath(self):
+		return self.__filePath
+	
+	@property
+	def images(self):
+		return self.__images	
+
+	def __processImages(self):
+		processor = ImageProcessor(self.__filePath)		
+		self.__imageSize = 
+		return processor.processFolderImages()	
+
+	def BuildConvNet(self):
+		
+		return self.layers
+
+if __name__ == "__main__":
+	yeet = ConvNet("test",5,5)
+	print(yeet.BuildConvNet())
