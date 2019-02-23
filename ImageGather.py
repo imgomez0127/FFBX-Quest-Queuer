@@ -4,9 +4,11 @@
 	Example:
 		$pyhton ImageGather.py <timeFrame> [Operating System]
 """
+#Python Base Libraries
 import os
 import subprocess
 import sys
+#Self Made Libraries
 from ImageScraper import ImageScraper
 
 class ImageGather(object):

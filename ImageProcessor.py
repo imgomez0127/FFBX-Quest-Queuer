@@ -3,9 +3,11 @@
 	it process the images by turning them into a numpy array 
 	which can be used for analysis in a machine learning algorithm
 """
+#Python Base Libraries
 import os
 import os.path
 import re
+#Installed Libraries
 import numpy as np
 from PIL import Image
 class ImageProcessor(object):

@@ -6,9 +6,11 @@
 		$python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1]
 [boundary 2] [boundary 3] [boundary 4]
 """
+#Python Base Libraries
 import os
 import re
 import sys
+#Installed Libraries
 import pyscreenshot as ImageGrab
 class ImageScraper(object):
 	"""
