@@ -22,8 +22,8 @@ class ImageProcessor(object):
         else:
             errMessage = "The input path is not a valid path folder path"
             raise NotADirectoryError(errMessage) 
-        self.__processedImages = []
-        self.__imageClasses = []
+        self.__processedImages = None
+        self.__imageClasses = None
 
     @property
     def folderPath(self):
@@ -43,6 +43,10 @@ class ImageProcessor(object):
     def processedImages(self,newImageLst):
         self.__processedImages = newImageLst
 
+    @property
+    def imageClasses(self):
+        return self.__imageClasses
+    
     def __ImageToArray(self,imagePath):
         """
             Args:
@@ -64,14 +68,18 @@ class ImageProcessor(object):
             in the member variable processedImages
         """ 
         fileList = os.listdir(self.__folderPath)
+        processedImages = []
+        imageClasses = []
         for fileName in fileList:
             try:
                 fullImagePath = self.__folderPath + "/" + fileName
                 imgAsArr = self.__ImageToArray(fullImagePath)
-                self.__processedImages.append(imgAsArr) 
-                self.__imageClasses.append(self.__classifyImages(fileName))
+                processedImages.append(imgAsArr) 
+                imageClasses.append(self.__classifyImages(fileName))
             except OSError:
                 continue
+        self.__processedImages = np.asarray(processedImages)
+        self.__imageClasses = np.asarray(imageClasses)
         return self.__processedImages
 
     def __classifyImages(self,fileName):
