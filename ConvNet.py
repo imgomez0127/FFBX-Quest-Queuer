@@ -67,7 +67,7 @@ class ConvNet(keras.Sequential):
         processedImages = processor.processFolderImages()
         if(len(processedImages) == 0):
             raise ValueError("There are no images in that folder")
-        self.__imageLabels = list(processor.imageClasses)
+        self.__imageLabels = processor.classifyImages()
         self.__imageShape = processedImages[0].shape
         return processedImages 
     def __computeFlattenSize(self):
@@ -76,20 +76,22 @@ class ConvNet(keras.Sequential):
         self.add(Reshape((60,150,3)))
         for _ in range(self.__convLayerAmt):
             self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
-                             padding="valid"))
+                             padding="same"))
             self.add(MaxPooling2D(self.__poolingSize))
         self.add(Flatten())
         for i in range(self.__denseLayersAmt):
-            self.add(Dense(1000,activation = "relu", use_bias=True))
-        self.add(Dense(1,activation="softmax"))
+            self.add(Dense(2000,activation = "relu", use_bias=True))
+        self.add(Dense(1,activation="sigmoid"))
         return self.layers
 
 if __name__ == "__main__": 
-    yeet = ConvNet("autobox",4,5)
+    yeet = ConvNet("autobox",2,5)
     yeet.BuildConvNet()
-    yeet.compile(optimizer = keras.optimizers.Adam(lr=.01),loss="categorical_crossentropy",metrics=["accuracy"])
-    yeet.fit(np.asarray(yeet.images),np.asarray(yeet.imageLabels),epochs=1,batch_size=1)
+    yeet.compile(optimizer = keras.optimizers.Adam(lr=.0000001),loss="categorical_crossentropy",metrics=["accuracy"])
+    labels = yeet.imageLabels
+    print(labels)
+    yeet.fit(np.asarray(yeet.images),labels,epochs=1,batch_size=1)
     print(np.array(yeet.images[0]).shape)
     print(yeet.predict(np.reshape(yeet.images[0],(1,60,150,3))))
-    print(yeet.imageLabels[0])
+    print(labels[0])
     yeet.summary()

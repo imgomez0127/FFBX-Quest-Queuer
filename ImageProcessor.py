@@ -69,22 +69,24 @@ class ImageProcessor(object):
         """ 
         fileList = os.listdir(self.__folderPath)
         processedImages = []
-        imageClasses = []
         for fileName in fileList:
             try:
                 fullImagePath = self.__folderPath + "/" + fileName
                 imgAsArr = self.__ImageToArray(fullImagePath)
                 processedImages.append(imgAsArr) 
-                imageClasses.append(self.__classifyImages(fileName))
             except OSError:
                 continue
         self.__processedImages = np.asarray(processedImages)
-        self.__imageClasses = np.asarray(imageClasses)
         return self.__processedImages
 
-    def __classifyImages(self,fileName):
+    def classifyImages(self):
         regexPos = re.compile("(Pos)+") 
-        return 1 if (regexPos.findall(fileName) != []) else 0 
+        imageClasses = []
+        fileList = os.listdir(self.__folderPath)
+        for fileName in fileList:
+            imageClasses.append(1 if (regexPos.findall(fileName) != []) else 0)
+        self.__imageClasses = np.asarray(imageClasses)
+        return self.__imageClasses
 
 if __name__ == "__main__":
     imgProc = ImageProcessor("autoboxExamples")
