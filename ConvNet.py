@@ -6,7 +6,7 @@ from PIL import Image
 import pyscreenshot as ImageGrab
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
-from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization
 from ImageProcessor import ImageProcessor 
 
 class ConvNet(keras.Sequential):
@@ -20,8 +20,8 @@ class ConvNet(keras.Sequential):
         self.__imageLabels = []
         self.__images = self.__processImages()
         self.__kernelSize = 3
-        self.__kernelChannels = 3
-        self.__poolingSize = 2
+        self.__kernelChannels = 13
+        self.__poolingSize = 3
     @property
     def boxname(self):
         return self.__boxname
@@ -74,9 +74,9 @@ class ConvNet(keras.Sequential):
         pass
     def BuildConvNet(self):
         self.add(Reshape((60,150,3)))
-        for _ in range(self.__convLayerAmt):
-            self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
-                             padding="same"))
+        for i in range(self.__convLayerAmt):
+            self.add(Conv2D(self.__kernelChannels*(i+1),self.__kernelSize,
+                             padding="Same"))
             self.add(MaxPooling2D(self.__poolingSize))
         self.add(Flatten())
         for i in range(self.__denseLayersAmt):
@@ -85,13 +85,17 @@ class ConvNet(keras.Sequential):
         return self.layers
 
 if __name__ == "__main__": 
-    yeet = ConvNet("autobox",2,5)
+    yeet = ConvNet("autobox",2,2)
     yeet.BuildConvNet()
-    yeet.compile(optimizer = keras.optimizers.Adam(lr=.0000001),loss="categorical_crossentropy",metrics=["accuracy"])
+    yeet.compile(optimizer = keras.optimizers.Adam(lr=.001),loss="binary_crossentropy",metrics=["accuracy"])
     labels = yeet.imageLabels
+    ims= np.asarray(yeet.images) / 255
+    print(ims)
     print(labels)
-    yeet.fit(np.asarray(yeet.images),labels,epochs=1,batch_size=1)
+    yeet.fit(ims,labels,epochs=100,batch_size=50)
     print(np.array(yeet.images[0]).shape)
-    print(yeet.predict(np.reshape(yeet.images[0],(1,60,150,3))))
-    print(labels[0])
+    predictions = yeet.predict(ims)
+    print(predictions)
+    print([round(x[0]) for x in predictions] == labels)
+    print(labels)
     yeet.summary()
