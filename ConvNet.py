@@ -20,8 +20,8 @@ class ConvNet(keras.Sequential):
         self.__imageLabels = []
         self.__images = self.__processImages()
         self.__kernelSize = 3
-        self.__kernelChannels = 13
-        self.__poolingSize = 3
+        self.__kernelChannels = 3
+        self.__poolingSize = 2
     @property
     def boxname(self):
         return self.__boxname
@@ -75,25 +75,25 @@ class ConvNet(keras.Sequential):
     def BuildConvNet(self):
         self.add(Reshape((60,150,3)))
         for i in range(self.__convLayerAmt):
-            self.add(Conv2D(self.__kernelChannels*(i+1),self.__kernelSize,
-                             padding="Same"))
+            self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
+                             padding="Valid"))
             self.add(MaxPooling2D(self.__poolingSize))
         self.add(Flatten())
         for i in range(self.__denseLayersAmt):
-            self.add(Dense(2000,activation = "relu", use_bias=True))
+            self.add(Dense(100,activation = "relu", use_bias=True))
         self.add(Dense(1,activation="sigmoid"))
         return self.layers
 
 if __name__ == "__main__": 
-    yeet = ConvNet("autobox",2,2)
+    yeet = ConvNet("autobox",2,5)
     yeet.BuildConvNet()
     yeet.compile(optimizer = keras.optimizers.Adam(lr=.001),loss="binary_crossentropy",metrics=["accuracy"])
     labels = yeet.imageLabels
     ims= np.asarray(yeet.images) / 255
     print(ims)
     print(labels)
-    yeet.fit(ims,labels,epochs=100,batch_size=50)
-    print(np.array(yeet.images[0]).shape)
+    yeet.fit(ims,labels,epochs=100,batch_size=1)
+    print(ims.shape)
     predictions = yeet.predict(ims)
     print(predictions)
     print([round(x[0]) for x in predictions] == labels)
