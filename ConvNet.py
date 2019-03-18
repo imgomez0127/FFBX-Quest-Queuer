@@ -92,7 +92,7 @@ if __name__ == "__main__":
     ims= np.asarray(yeet.images) / 255
     print(ims)
     print(labels)
-    yeet.fit(ims,labels,epochs=100,batch_size=1)
+    yeet.fit(ims,labels,epochs=100,batch_size=1,validation_split=0.2)
     print(ims.shape)
     predictions = yeet.predict(ims)
     print(predictions)
