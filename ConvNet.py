@@ -10,18 +10,20 @@ from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape
 from ImageProcessor import ImageProcessor 
 
 class ConvNet(keras.Sequential):
-    def __init__(self, boxname, convLayerAmt, denseLayersAmt):
+    def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
         super().__init__()
         self.__boxname = boxname
-        self.__convLayerAmt = convLayerAmt
-        self.__denseLayersAmt = denseLayersAmt
-        self.__imageShape = 0
+        self.__convLayerAmt = convLayerAmt self.__denseLayersAmt = denseLayersAmt
+        self.__imageShape = None
         self.__filePath = "./" + self.__boxname + "Examples"
         self.__imageLabels = []
         self.__images = self.__processImages()
         self.__kernelSize = 3
         self.__kernelChannels = 3
         self.__poolingSize = 2
+        if(not os.path.isdir(modelDir)):
+            raise OSError("The input directory " + str(newDir) +" directory does not exist")
+        self.__modelDir = modelDir
     @property
     def boxname(self):
         return self.__boxname
@@ -32,6 +34,8 @@ class ConvNet(keras.Sequential):
 
     @convLayerAmt.setter
     def convLayerAmt(self,convLayerAmt):
+        if(type(convLayerAmt) != int):
+            raise ValueError("ConvLayerAmt is not of type int")
         self.__convLayerAmt = convLayerAmt
     
     @property
@@ -48,8 +52,8 @@ class ConvNet(keras.Sequential):
     
     @imageShape.setter
     def imageShape(self,imageShape):
-        self.__imageShape = imageShape
-    
+        self.__imageShape = imageShape 
+
     @property
     def filePath(self):
         return self.__filePath
@@ -59,9 +63,50 @@ class ConvNet(keras.Sequential):
         return self.__images    
 
     @property
+    def kernelSize(self):
+        return self.__kernelSize
+    
+    @kernelSize.setter
+    def kernelSize(self,kernelSize):
+        if(type(kernelSize) != int):
+            raise ValueError("The input kernelSize is not an int") 
+        self.__kernelSize == kernelSize
+    
+    @property
+    def kernelChannels(self):
+        return self.__kernelChannels
+    
+    @kernelChannels.setter
+    def kernelChannels(self,kernelChannels):
+        if(type(kernelChannels) != int):
+            raise ValueError("The inputted kernelChannels is not of type int")
+        self.__kernelChannels = kernelChannels
+    @property
+    def poolingSize(self):
+        return self.__poolingSize
+    
+    @poolingSize.setter
+    def poolingSize(self,poolingSize):
+        if(type(poolingSize) != int):
+            raise ValueError("The inputted poolingSize is not of type int")
+        self.__poolingSize = poolingSize
+
+    @property
     def imageLabels(self):
         return self.__imageLabels
 
+    @property
+    def modelDir(self):
+        return self.__modelDir
+
+    @modelDir.setter
+    def modelDir(self,newDir):
+        if(not os.path.isdir(newDir)):
+            raise OSError("The input directory " + str(newDir) +" directory does not exist")
+        self.__modelDir = newDir
+    @property
+    def modelPath(self):
+        return self.modelDir+self.boxname+".h5" 
     def __processImages(self):
         processor = ImageProcessor(self.__filePath)     
         processedImages = processor.processFolderImages()
@@ -84,6 +129,13 @@ class ConvNet(keras.Sequential):
         self.add(Dense(1,activation="sigmoid"))
         return self.layers
 
+    def save(self):
+        super().save(self.modelPath)
+    
+    def load_weights(self):
+        if(not os.exists(self.modelPath)):
+            raise OSError("The model does not exist") 
+        super.load_weights(self.modelPath)
 if __name__ == "__main__": 
     yeet = ConvNet("autobox",2,5)
     yeet.BuildConvNet()
@@ -99,3 +151,5 @@ if __name__ == "__main__":
     print([round(x[0]) for x in predictions] == labels)
     print(labels)
     yeet.summary()
+    yeet.save()
+    del yeet
