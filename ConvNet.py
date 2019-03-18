@@ -13,7 +13,8 @@ class ConvNet(keras.Sequential):
     def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
         super().__init__()
         self.__boxname = boxname
-        self.__convLayerAmt = convLayerAmt self.__denseLayersAmt = denseLayersAmt
+        self.__convLayerAmt = convLayerAmt 
+        self.__denseLayersAmt = denseLayersAmt
         self.__imageShape = None
         self.__filePath = "./" + self.__boxname + "Examples"
         self.__imageLabels = []
@@ -136,20 +137,23 @@ class ConvNet(keras.Sequential):
         if(not os.exists(self.modelPath)):
             raise OSError("The model does not exist") 
         super.load_weights(self.modelPath)
+    
+    def __regularizeImages(self,images):
+        return images/255
+    def train(self):
+        trainingImages = self.__regularizeImages(self.__images)
+        trainingLabels = self.__imageLabels 
+        self.compile(optimizer = keras.optimizers.Adam(lr=.001),
+                    loss="binary_crossentropy",metrics=["accuracy"])
+        self.fit(trainingImages,trainingLabels,epochs=100,
+                batch_size=trainingLabels.shape[0],validation_split=0.2)
+        
 if __name__ == "__main__": 
     yeet = ConvNet("autobox",2,5)
     yeet.BuildConvNet()
-    yeet.compile(optimizer = keras.optimizers.Adam(lr=.001),loss="binary_crossentropy",metrics=["accuracy"])
-    labels = yeet.imageLabels
-    ims= np.asarray(yeet.images) / 255
-    print(ims)
-    print(labels)
-    yeet.fit(ims,labels,epochs=100,batch_size=1,validation_split=0.2)
-    print(ims.shape)
-    predictions = yeet.predict(ims)
+    yeet.train()
+    predictions = yeet.predict(yeet.images)
     print(predictions)
-    print([round(x[0]) for x in predictions] == labels)
-    print(labels)
+    print([round(x[0]) for x in predictions] == yeet.imageLabels)
+    print(yeet.imageLabels)
     yeet.summary()
-    yeet.save()
-    del yeet
