@@ -84,7 +84,7 @@ class ImageScraper(object):
             if(not isinstance(val,int)):
                 raise ValueError("The boundary take in 4 integer inputs")
         self.__boundary = boundary
-    def __getRecentScreenshot(self,path):
+    def __getLatestScreenshot(self,path):
         regex = re.compile("[0-9]+")
         imgLst = os.listdir(path)
         if len(imgLst) == 0:
@@ -94,14 +94,14 @@ class ImageScraper(object):
 
     def takeScreenshots(self):
         """
-            This function takes an screenshot for the range 0-imageCount
+            This function takes an screenshot for the range 0 to imageCount
             screenshots the given boundary every 1 second and saves it with 
             the given fileName in a jpg format and outputs it to the 
             given filePath
         """
-        recentScreenshot = self.__getRecentScreenshot(self.path)
+        latestScreenshot = self.__getLatestScreenshot(self.path)
         for i in range(self.__imageCount):
-            screenshotNum = str(i+recentScreenshot)
+            screenshotNum = str(i+latestScreenshot)
             if(self.__boundary != ()):
                 screenshot = ImageGrab.grab(self.boundary)
             else:
@@ -116,7 +116,8 @@ class ImageScraper(object):
             else:
                 filePath += self.path +'/' + self.__fileName + screenshotNum + ".jpg"
             screenshot.save(filePath)
-    def getImage(self):
+    @staticmethod
+    def grabScreen():
         return ImageGrab.grab()
 
 if __name__ == '__main__':

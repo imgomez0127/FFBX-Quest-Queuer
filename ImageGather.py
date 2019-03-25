@@ -21,7 +21,7 @@ class ImageGather(object):
     """
     @staticmethod
     def determineResolution():
-        bbox = ImageScraper(1).getImage().getbbox()  
+        bbox = ImageScraper.grabScreen().getbbox()  
         return str(bbox[2]) + "x" + str(bbox[3]) 
 
     def __init__(self,timeFrame,OS="linux"):
@@ -119,6 +119,13 @@ Please Input a choice : """
         """
         boundary = self.findBoundary(boxtype)
         fileName = boxtype + ("Pos" if (PosExample) else "Neg")
+        path = boxtype + "Examples"
+        imageScraper = ImageScraper(self.__timeFrame,fileName,path,boundary)
+        imageScraper.takeScreenshots()
+
+    def gatherCategoricalScreenshots(self,category,boxtype):
+        boundary = self.findBoundary(boxtype)
+        fileName = boxType + str(categoryNum) + "Class"
         path = boxtype + "Examples"
         imageScraper = ImageScraper(self.__timeFrame,fileName,path,boundary)
         imageScraper.takeScreenshots()

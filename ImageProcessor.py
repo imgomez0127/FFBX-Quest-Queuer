@@ -88,6 +88,21 @@ class ImageProcessor(object):
         self.__imageClasses = np.asarray(imageClasses)
         return self.__imageClasses
 
+    def __findHighestClasses(self,fileList):
+        numberRegex = re.compile("[0-9]+")
+        classNumbers = {int(numberRegex.findall(fileName)[0]) for fileName in fileList}
+        return max(classNumbers) 
+
+    def classifyCategoricalImages(self):
+        numberRegex = re.compile("[0-9]+")
+        labels = []
+        fileList = os.listdir(self.__folderPath)
+        highestClassNumber = self.__findHighestClass(fileList)
+        for fileName in fileList:
+            oneHotClasses = np.zero(highestClassNumber)
+            categoryNumber = regexNum.findall(fileName)[0]
+            oneHotClasses[int(categoryNumber)] = 1
+            labels.append(oneHotClasses)
 if __name__ == "__main__":
     imgProc = ImageProcessor("autoboxExamples")
     print(len(os.listdir("autoboxExamples")))

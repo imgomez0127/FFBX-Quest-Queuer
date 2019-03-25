@@ -1,3 +1,4 @@
+from functools import reduce
 import os
 import time
 import numpy as np
@@ -118,7 +119,7 @@ class ConvNet(keras.Sequential):
         return processedImages 
     def __computeFlattenSize(self):
         pass
-    def BuildConvNet(self):
+    def BuildConvNet(self,output = 1):
         self.add(Reshape((60,150,3)))
         for i in range(self.__convLayerAmt):
             self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
@@ -127,7 +128,7 @@ class ConvNet(keras.Sequential):
         self.add(Flatten())
         for i in range(self.__denseLayersAmt):
             self.add(Dense(100,activation = "relu", use_bias=True))
-        self.add(Dense(1,activation="sigmoid"))
+        self.add(Dense(output,activation="sigmoid"))
         return self.layers
 
     def save(self):
@@ -149,11 +150,11 @@ class ConvNet(keras.Sequential):
                 batch_size=trainingLabels.shape[0],validation_split=0.2)
         
 if __name__ == "__main__": 
-    yeet = ConvNet("autobox",2,5)
-    yeet.BuildConvNet()
-    yeet.train()
-    predictions = yeet.predict(yeet.images)
+    testModel = ConvNet("autobox",2,5)
+    testModel.BuildConvNet()
+    testModel.train()
+    predictions = testModel.predict(testModel.images)
     print(predictions)
-    print([round(x[0]) for x in predictions] == yeet.imageLabels)
-    print(yeet.imageLabels)
-    yeet.summary()
+    print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == testModel.imageLabels))
+    print(testModel.imageLabels)
+    testModel.summary()
