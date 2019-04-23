@@ -123,7 +123,7 @@ Please Input a choice : """
         imageScraper = ImageScraper(self.__timeFrame,fileName,path,boundary)
         imageScraper.takeScreenshots()
 
-    def gatherCategoricalScreenshots(self,category,boxtype):
+    def gatherCategoricalScreenshots(self,categoryNum,boxtype):
         boundary = self.findBoundary(boxtype)
         fileName = boxType + str(categoryNum) + "Class"
         path = boxtype + "Examples"

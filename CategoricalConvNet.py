@@ -112,13 +112,13 @@ class ConvNet(keras.Sequential):
         return self.modelDir+self.boxname+".h5" 
 
     def __processImages(self):
-        processor = ImageProcessor(self.__filePath)     
+        processor = ImageProcessor(self.__filePath)
         processedImages = processor.processFolderImages()
         if(len(processedImages) == 0):
             raise ValueError("There are no images in that folder")
-        self.__imageLabels = processor.classifyImagesAsPositiveOrNegative()
+        self.__imageLabels = processor.classifyCategoricalImages()
         self.__imageShape = processedImages[0].shape
-        return processedImages 
+        return processedImages
 
     def __computeFlattenSize(self):
         pass
@@ -132,7 +132,7 @@ class ConvNet(keras.Sequential):
         self.add(Flatten())
         for i in range(self.__denseLayersAmt):
             self.add(Dense(100,activation = "relu", use_bias=True))
-        self.add(Dense(1,activation="sigmoid"))
+        self.add(Dense(len(self.__imageLabels[0]),activation="softmax"))
         return self.layers
 
     def save(self):
@@ -150,12 +150,12 @@ class ConvNet(keras.Sequential):
         trainingImages = self.__regularizeImages(self.__images)
         trainingLabels = self.__imageLabels 
         self.compile(optimizer = keras.optimizers.Adam(lr=.001),
-                    loss="binary_crossentropy",metrics=["accuracy"])
+                    loss="categorical_crossentropy",metrics=["accuracy"])
         self.fit(trainingImages,trainingLabels,epochs=100,
                 batch_size=trainingLabels.shape[0],validation_split=0.2)
         
 if __name__ == "__main__": 
-    testModel = ConvNet("autobox",2,5)
+    testModel = ConvNet("screenbox",2,5)
     testModel.BuildConvNet()
     testModel.train()
     predictions = testModel.predict(testModel.images)

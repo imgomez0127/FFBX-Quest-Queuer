@@ -4,12 +4,14 @@
     which can be used for analysis in a machine learning algorithm
 """
 #Python Base Libraries
+import json
 import os
 import os.path
 import re
 #Installed Libraries
 import numpy as np
 from PIL import Image
+from tensorflow import one_hot
 class ImageProcessor(object):
     """
         Args:
@@ -57,7 +59,7 @@ class ImageProcessor(object):
             numpy array for that image
         """
         im = Image.open(imagePath)
-        imArr = np.asarray(im)
+        imArr = np.asarray(im,dtype="float64")
         im.close()
         return imArr    
 
@@ -76,33 +78,36 @@ class ImageProcessor(object):
                 processedImages.append(imgAsArr) 
             except OSError:
                 continue
-        self.__processedImages = np.asarray(processedImages)
+        self.__processedImages = np.asarray(processedImages,dtype="float64")
         return self.__processedImages
 
-    def classifyImages(self):
+    def classifyImagesAsPositiveOrNegative(self):
         regexPos = re.compile("(Pos)+") 
         imageClasses = []
         fileList = os.listdir(self.__folderPath)
         for fileName in fileList:
             imageClasses.append(1 if (regexPos.findall(fileName) != []) else 0)
-        self.__imageClasses = np.asarray(imageClasses)
+        self.__imageClasses = np.asarray(imageClasses,dtype="float64")
         return self.__imageClasses
 
-    def __findHighestClasses(self,fileList):
+    def __getHighestCategoryNumber(self,fileLst):
         numberRegex = re.compile("[0-9]+")
-        classNumbers = {int(numberRegex.findall(fileName)[0]) for fileName in fileList}
-        return max(classNumbers) 
+        maxNum = float("-inf")
+        for fileName in fileLst:
+            matchedLst = numberRegex.findall(fileName)
+            if(len(matchedLst) != 2):
+                message = "File %s is not formatted in [A-Za-z]+[0-9]+[A-Za-z]+[0-9]+"
+                raise ValueError(message%fileName)
+            maxNum = int(matchedLst[0]) if (int(matchedLst[0]) > maxNum) else maxNum
+        return maxNum
 
     def classifyCategoricalImages(self):
         numberRegex = re.compile("[0-9]+")
-        labels = []
-        fileList = os.listdir(self.__folderPath)
-        highestClassNumber = self.__findHighestClass(fileList)
-        for fileName in fileList:
-            oneHotClasses = np.zero(highestClassNumber)
-            categoryNumber = regexNum.findall(fileName)[0]
-            oneHotClasses[int(categoryNumber)] = 1
-            labels.append(oneHotClasses)
+        fileLst = os.listdir(self.__folderPath)
+        highestCategoryNumber = self.__getHighestCategoryNumber(fileLst)
+        labels = [int(numberRegex.findall(fileName)[0]) for fileName in fileLst]
+        return one_hot(labels,highestCategoryNumber+1)
+
 if __name__ == "__main__":
     imgProc = ImageProcessor("autoboxExamples")
     print(len(os.listdir("autoboxExamples")))

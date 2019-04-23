@@ -18,7 +18,7 @@ class ImageScraper(object):
             imageCount (int): The amount of images that should be taken
             fileName (str): The name of the output file
             path (str): The name of the output path 
-            boundary (:obj:4-tuple of :obj:int): a 4-tuple of integer values 
+            boundary (:obj:4-tuple of int): a 4-tuple of integer values 
             that represent the boundary box of the screenshot
     """
     def __init__(self,imageCount,fileName="Screenshot",path="./Screenshots",boundary=()):
@@ -116,6 +116,7 @@ class ImageScraper(object):
             else:
                 filePath += self.path +'/' + self.__fileName + screenshotNum + ".jpg"
             screenshot.save(filePath)
+
     @staticmethod
     def grabScreen():
         return ImageGrab.grab()
