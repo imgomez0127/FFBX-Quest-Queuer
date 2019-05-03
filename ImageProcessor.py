@@ -2,6 +2,8 @@
     A python class to process all the images within a folder
     it process the images by turning them into a numpy array 
     which can be used for analysis in a machine learning algorithm
+
+    @author Ian Gomez imgomez0127@github
 """
 #Python Base Libraries
 import json
@@ -54,7 +56,8 @@ class ImageProcessor(object):
             Args:
                 imagePath(str): The path to the image that 
                 is to be converted to a numpy array
-
+            Returns:
+                imArr(np.array[float64]): Array of matrix representation of images
             This function takes in a path to an image and returns the a 
             numpy array for that image
         """

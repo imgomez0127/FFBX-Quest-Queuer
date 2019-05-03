@@ -1,3 +1,11 @@
+"""
+    A python class to create the convolutional neural network
+    which will be used to establish what type of box is being.
+    This class inherit from the keras.Sequential model and also 
+    has functions which process and regularize the images
+
+    @author Ian Gomez imgomez0127@github
+"""
 from functools import reduce
 import os
 import time
@@ -16,10 +24,10 @@ class ConvNet(keras.Sequential):
         self.__boxname = boxname
         self.__convLayerAmt = convLayerAmt 
         self.__denseLayersAmt = denseLayersAmt
-        self.__imageShape = None
         self.__filePath = "./" + self.__boxname + "Examples"
         self.__imageLabels = []
         self.__images = self.__processImages()
+        self.__imageShape = len(self.__images[0])
         self.__kernelSize = 3
         self.__kernelChannels = 3
         self.__poolingSize = 2
@@ -29,10 +37,12 @@ class ConvNet(keras.Sequential):
 
     @property
     def boxname(self):
+        #Name of the box which the ConvNet will predict for
         return self.__boxname
     
     @property
     def convLayerAmt(self):
+        #Amount of Convolution Layers
         return self.__convLayerAmt
 
     @convLayerAmt.setter
@@ -43,6 +53,7 @@ class ConvNet(keras.Sequential):
     
     @property
     def denseLayersAmt(self):
+        #Amount of Dense Layers
         return self.__denseLayersAmt
     
     @denseLayersAmt.setter
@@ -59,14 +70,17 @@ class ConvNet(keras.Sequential):
 
     @property
     def filePath(self):
+        #File path for the images
         return self.__filePath
     
     @property
     def images(self):
+        #A numpy array of images
         return self.__images    
 
     @property
     def kernelSize(self):
+        #Size of the convolutional kernel
         return self.__kernelSize
     
     @kernelSize.setter
@@ -77,6 +91,7 @@ class ConvNet(keras.Sequential):
     
     @property
     def kernelChannels(self):
+        #The amount of kernels that will be run over the image per convolutional layer
         return self.__kernelChannels
     
     @kernelChannels.setter
@@ -84,6 +99,7 @@ class ConvNet(keras.Sequential):
         if(type(kernelChannels) != int):
             raise ValueError("The inputted kernelChannels is not of type int")
         self.__kernelChannels = kernelChannels
+
     @property
     def poolingSize(self):
         return self.__poolingSize
@@ -100,6 +116,7 @@ class ConvNet(keras.Sequential):
 
     @property
     def modelDir(self):
+        #Directory for the model
         return self.__modelDir
 
     @modelDir.setter
@@ -107,18 +124,32 @@ class ConvNet(keras.Sequential):
         if(not os.path.isdir(newDir)):
             raise OSError("The input directory " + str(newDir) +" directory does not exist")
         self.__modelDir = newDir
+
     @property
     def modelPath(self):
+        #Path of the model h5 file
         return self.modelDir+self.boxname+".h5" 
 
     def __processImages(self):
+        """
+            Returns:
+                processedImages(np.array[float64]): Array of images represented as matrices
+            This function processes and returns the images in the folder that holds the examples for the box
+            specified by self.__boxname
+        """
         processor = ImageProcessor(self.__filePath)     
         processedImages = processor.processFolderImages()
         if(len(processedImages) == 0):
             raise ValueError("There are no images in that folder")
-        self.__imageLabels = processor.classifyImagesAsPositiveOrNegative()
-        self.__imageShape = processedImages[0].shape
         return processedImages 
+
+    def __classifyImages(self):
+        """
+            This function classifies the images in the folder that 
+            holds the examples for the box specifed by self.__boxname
+        """
+        processor = ImageProcessor(self.__filePath)
+        self.__imageLabels = processor.classifyImagesAsPositiveOrNegative()
 
     def __computeFlattenSize(self):
         pass

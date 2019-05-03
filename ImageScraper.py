@@ -5,6 +5,8 @@
     Example:
         $python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1]
 [boundary 2] [boundary 3] [boundary 4]
+
+    @author Ian Gomez imgomez0127@github
 """
 #Python Base Libraries
 import os
@@ -84,6 +86,7 @@ class ImageScraper(object):
             if(not isinstance(val,int)):
                 raise ValueError("The boundary take in 4 integer inputs")
         self.__boundary = boundary
+
     def __getLatestScreenshot(self,path):
         regex = re.compile("[0-9]+")
         imgLst = os.listdir(path)
