@@ -13,7 +13,7 @@ import re
 #Installed Libraries
 import numpy as np
 from PIL import Image
-from tensorflow import one_hot
+from tensorflow import one_hot,convert_to_tensor
 class ImageProcessor(object):
     """
         Args:
@@ -62,7 +62,7 @@ class ImageProcessor(object):
             numpy array for that image
         """
         im = Image.open(imagePath)
-        imArr = np.asarray(im,dtype="float64")
+        imArr = convert_to_tensor(np.asarray(im,dtype="float64"))
         im.close()
         return imArr    
 
@@ -81,16 +81,16 @@ class ImageProcessor(object):
                 processedImages.append(imgAsArr) 
             except OSError:
                 continue
-        self.__processedImages = np.asarray(processedImages,dtype="float64")
+        self.__processedImages = convert_to_tensor(processedImages,dtype="float64")
         return self.__processedImages
 
-    def classifyImagesAsPositiveOrNegative(self):
+    def classifyImages(self):
         regexPos = re.compile("(Pos)+") 
         imageClasses = []
         fileList = os.listdir(self.__folderPath)
         for fileName in fileList:
             imageClasses.append(1 if (regexPos.findall(fileName) != []) else 0)
-        self.__imageClasses = np.asarray(imageClasses,dtype="float64")
+        self.__imageClasses = convert_to_tensor(imageClasses,dtype="float64")
         return self.__imageClasses
 
     def __getHighestCategoryNumber(self,fileLst):

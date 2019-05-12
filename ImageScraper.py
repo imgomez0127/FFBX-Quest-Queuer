@@ -120,6 +120,9 @@ class ImageScraper(object):
                 filePath += self.path +'/' + self.__fileName + screenshotNum + ".jpg"
             screenshot.save(filePath)
 
+    def grabRegion(self):
+        return ImageGrab.grab(self.boundary) 
+
     @staticmethod
     def grabScreen():
         return ImageGrab.grab()

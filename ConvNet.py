@@ -14,8 +14,9 @@ import pandas
 from PIL import Image
 import pyscreenshot as ImageGrab
 from sklearn.model_selection import train_test_split
-from tensorflow import keras
-from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization
+from tensorflow import keras,convert_to_tensor
+from tensorflow import shape as tfshape
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization,Input
 from ImageProcessor import ImageProcessor 
 
 class ConvNet(keras.Sequential):
@@ -25,7 +26,7 @@ class ConvNet(keras.Sequential):
         self.__convLayerAmt = convLayerAmt 
         self.__denseLayersAmt = denseLayersAmt
         self.__filePath = "./" + self.__boxname + "Examples"
-        self.__imageLabels = []
+        self.__imageLabels = self.__classifyImages()
         self.__images = self.__processImages()
         self.__imageShape = len(self.__images[0])
         self.__kernelSize = 3
@@ -149,13 +150,17 @@ class ConvNet(keras.Sequential):
             holds the examples for the box specifed by self.__boxname
         """
         processor = ImageProcessor(self.__filePath)
-        self.__imageLabels = processor.classifyImagesAsPositiveOrNegative()
+        labels = processor.classifyImages()
+        if(len(labels) == 0):
+            raise ValueError("There are no images in that folder")
+
+        return labels
 
     def __computeFlattenSize(self):
         pass
 
     def BuildConvNet(self):
-        self.add(Reshape((60,150,3)))
+        Input(shape=self.__images[0].shape)
         for i in range(self.__convLayerAmt):
             self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
                              padding="Valid"))
@@ -168,7 +173,9 @@ class ConvNet(keras.Sequential):
 
     def save(self):
         super().save(self.modelPath)
-    
+
+    def grabRegionAsTensor(): 
+         
     def load_weights(self):
         if(not os.exists(self.modelPath)):
             raise OSError("The model does not exist") 
@@ -191,6 +198,6 @@ if __name__ == "__main__":
     testModel.train()
     predictions = testModel.predict(testModel.images)
     print(predictions)
-    print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == testModel.imageLabels))
+    print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == np.asarray(testModel.imageLabels)))
     print(testModel.imageLabels)
     testModel.summary()
