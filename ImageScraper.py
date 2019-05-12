@@ -23,11 +23,14 @@ class ImageScraper(object):
             boundary (:obj:4-tuple of int): a 4-tuple of integer values 
             that represent the boundary box of the screenshot
     """
-    def __init__(self,imageCount,fileName="Screenshot",path="./Screenshots",boundary=()):
+    def __init__(self,imageCount,boxtype,OS="linux",fileName="Screenshot",path="./Screenshots"):
         self.__imageCount = imageCount
+        self.__boxtype = boxtype
+        self.__OS = OS
         self.__fileName = fileName
-        self.__boundary = boundary
         self.__path = path
+        self.__resolution = self.getResolution()
+        self.__boundary = self.findBoundary(boxtype)
         if(not os.path.exists(self.__path)):
             try:
                 os.mkdir(self.__path)
@@ -63,7 +66,7 @@ class ImageScraper(object):
     def path(self):
         #path (str): The name of the output path
         return self.__path
-
+    
     @path.setter
     def path(self,path):
         if(not os.path.exists(self.__path)):
@@ -87,6 +90,29 @@ class ImageScraper(object):
                 raise ValueError("The boundary take in 4 integer inputs")
         self.__boundary = boundary
 
+    @property
+    def boxtype(self):
+    #boxtype (str): Name of the box to be screenshoted
+        return self.__boxtype
+    
+    @boxtype.setter
+    def boxtype(self,boxtype):
+        self.__boxtype = boxtype
+
+    @property
+    def OS(self):
+    #OS (str): Name of the operating system being used by the computer
+        return self.__OS
+    
+    @OS.setter
+    def OS(self,OS):
+        self.__OS = OS
+
+    @property
+    def resolution(self):
+        #The screen resolution of the current computer
+        return self.__resolution
+
     def __getLatestScreenshot(self,path):
         regex = re.compile("[0-9]+")
         imgLst = os.listdir(path)
@@ -94,21 +120,46 @@ class ImageScraper(object):
             return 0
         intLst = [int(regex.findall(im)[0]) for im in imgLst]
         return max(intLst)+1
+    
+    def findBoundary(self,boundaryName):
+        """
+            Args:   
+                boundaryName (str): The name of the boundary box that 
+                is being searched for 
+
+            Returns:
+                boundrybox (4-tuple of ints)        
+        """
+        bboxSetting = "[" + self.__OS.lower() + "-" + boundaryName + "-" + self.__resolution + "]"
+        f = open("box-sizes/box-sizes.cfg","r") 
+        curLine = f.readline()
+        while(curLine != "" and curLine[:-1] != bboxSetting):
+            curLine = f.readline()
+        bbox = f.readline()
+        f.close()
+        if(bbox == ""):
+            raise ValueError("Could not find boundary in the box-sizes.cfg file")
+        return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
 
     def takeScreenshots(self):
         """
-            This function takes an screenshot for the range 0 to imageCount
-            screenshots the given boundary every 1 second and saves it with 
-            the given fileName in a jpg format and outputs it to the 
-            given filePath
+            Returns:
+                screenshots (list of 2-tuple of (str,Image)): a list of 2-tuples
+                where the first item is the screenshot name and the second item
+                is the Image object
+            
+            This function takes screenshots of the given boundary and returns
+            a list of screenshots which are tuples of screenshot names and the 
+            Image object
         """
         latestScreenshot = self.__getLatestScreenshot(self.path)
+        screenshot = [] 
         for i in range(self.__imageCount):
             screenshotNum = str(i+latestScreenshot)
             if(self.__boundary != ()):
-                screenshot = ImageGrab.grab(self.boundary)
+                image = ImageGrab.grab(self.boundary)
             else:
-                screenshot = ImageGrab.grab()
+                image = ImageGrab.grab()
             filePath = ""
             if(self.__path[0] != "."):
                 filePath += "."
@@ -118,32 +169,32 @@ class ImageScraper(object):
                 filePath += self.path + self.fileName + screenshotNum + ".jpg"
             else:
                 filePath += self.path +'/' + self.__fileName + screenshotNum + ".jpg"
-            screenshot.save(filePath)
+            screenshot.append((filePath,image))
+        return screenshot
 
-    def grabRegion(self):
+    def saveScreenshots(self,screenshots):
+        """
+            Args:
+                screenshots (list of 2-tuple of (str,Image)): a list of 2-tuples
+                where the first item is the screenshot name and the second item
+                is the Image object
+            
+            This function takes in a list of screenshots and saves them
+        """
+        for filePath,image in screenshots:
+            image.save(filePath)
+        
+    def grabScreenRegion(self):
         return ImageGrab.grab(self.boundary) 
 
     @staticmethod
     def grabScreen():
         return ImageGrab.grab()
 
+    @staticmethod
+    def getResolution():
+        screenBoundary = ImageScraper.grabScreen().getbbox()
+        return str(screenBoundary[2]) + "x" + str(screenBoundary[3])
+
 if __name__ == '__main__':
-    if(len(sys.argv)<2 or len(sys.argv) > 8):
-        print("Usage: python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1] [boundary 2] [boundary 3] [boundary 4]")
-        sys.exit(1)
-    Scraper = ImageScraper(int(sys.argv[1]))
-    if(len(sys.argv)>=3):
-        Scraper.fileName=sys.argv[2]
-    if(len(sys.argv)>=4):
-        Scraper.path=sys.argv[3]
-    
-    if(len(sys.argv)>4 and len(sys.argv) == 8):
-        try:
-            Scraper.boundary=(int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]),int(sys.argv[7]))
-        except ValueError as e:
-            print(e)
-            sys.exit(1)
-    elif(len(sys.argv)>4 and len(sys.argv)!=8):
-        print("Usage: python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1] [boundary 2] [boundary 3] [boundary 4]")
-        sys.exit(1)
-    Scraper.takeScreenshots()
+    print("hello world")

@@ -19,15 +19,10 @@ class ImageGather(object):
 
             OS(str): The current operating system the user is using
     """
-    @staticmethod
-    def determineResolution():
-        bbox = ImageScraper.grabScreen().getbbox()  
-        return str(bbox[2]) + "x" + str(bbox[3]) 
 
     def __init__(self,timeFrame,OS="linux"):
         self.__timeFrame = timeFrame
         self.__OS = OS.strip()
-        self.__resolution = ImageGather.determineResolution()
 
     @property
     def timeFrame(self):
@@ -47,30 +42,7 @@ class ImageGather(object):
     def OS(self,OS):
         self.__OS = OS
     
-    @property
-    def resolution(self):
-        #The screen resolution of the current computer
-        return self.__resolution
 
-    def findBoundary(self,boundaryName):
-        """
-            Args:   
-                boundaryName (str): The name of the boundary box that 
-                is being searched for 
-
-            Returns:
-                boundrybox (4-tuple of ints)        
-        """
-        bboxSetting = "[" + self.__OS.lower() + "-" + boundaryName + "-" + self.__resolution + "]"
-        f = open("box-sizes/box-sizes.cfg","r") 
-        curLine = f.readline()
-        while(curLine != "" and curLine[:-1] != bboxSetting):
-            curLine = f.readline()
-        bbox = f.readline()
-        f.close()
-        if(bbox == ""):
-            raise ValueError("Could not find boundary in the box-sizes.cfg file")
-        return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
     
     def gatherData(self):
         #This function proccesses the commands for which screenshots to take.
@@ -117,18 +89,19 @@ Please Input a choice : """
             or not it is a Positive or Negative example 
             (as indicated by the user) for ease of data labelling
         """
-        boundary = self.findBoundary(boxtype)
         fileName = boxtype + ("Pos" if (PosExample) else "Neg")
         path = boxtype + "Examples"
-        imageScraper = ImageScraper(self.__timeFrame,fileName,path,boundary)
-        imageScraper.takeScreenshots()
+        imageScraper = ImageScraper(self.__timeFrame,boxtype,self.__OS,fileName,path)
+        screenshots = imageScraper.takeScreenshots()
+        imageScraper.saveScreenshots(screenshots) 
 
     def gatherCategoricalScreenshots(self,categoryNum,boxtype):
-        boundary = self.findBoundary(boxtype)
         fileName = boxType + str(categoryNum) + "Class"
         path = boxtype + "Examples"
-        imageScraper = ImageScraper(self.__timeFrame,fileName,path,boundary)
-        imageScraper.takeScreenshots()
+        imageScraper = ImageScraper(self.__timeFrame,boxtype,self.__OS,fileName,path,boundary)
+        screenshots = imageScraper.takeScreenshots()
+        imageScraper.saveScreenshots(screenshots)
+
 
 if __name__ == "__main__":
     if(len(sys.argv) < 2 or len(sys.argv) > 3):
