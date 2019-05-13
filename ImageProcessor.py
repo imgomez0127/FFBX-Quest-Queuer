@@ -20,6 +20,11 @@ class ImageProcessor(object):
             folderPath(str): A string to the folder path that images will 
             be pulled from
     """ 
+
+    @staticmethod
+    def toImageTensor(image):
+        return convert_to_tensor(np.asarray(image,dtype="float64"))
+
     def __init__(self,folderPath = "./Screenshots"):
         if(os.path.isdir(folderPath)):
             self.__folderPath = folderPath
@@ -51,7 +56,7 @@ class ImageProcessor(object):
     def imageClasses(self):
         return self.__imageClasses
     
-    def __ImageToArray(self,imagePath):
+    def __folderImagesToTensor(self,imagePath):
         """
             Args:
                 imagePath(str): The path to the image that 
@@ -65,7 +70,7 @@ class ImageProcessor(object):
         imArr = convert_to_tensor(np.asarray(im,dtype="float64"))
         im.close()
         return imArr    
-
+    
     def processFolderImages(self):
         """
             This function selects the folderPath memeber variable and 
@@ -77,7 +82,7 @@ class ImageProcessor(object):
         for fileName in fileList:
             try:
                 fullImagePath = self.__folderPath + "/" + fileName
-                imgAsArr = self.__ImageToArray(fullImagePath)
+                imgAsArr = self.__folderImagesToTensor(fullImagePath)
                 processedImages.append(imgAsArr) 
             except OSError:
                 continue

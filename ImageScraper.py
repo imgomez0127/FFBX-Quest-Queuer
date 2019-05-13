@@ -17,14 +17,23 @@ import pyscreenshot as ImageGrab
 class ImageScraper(object):
     """
         Args:
-            imageCount (int): The amount of images that should be taken
+            boxtype(str): String that represents what type of 
+            image is being taken
+            OS(str): The operating system of the current system
             fileName (str): The name of the output file
             path (str): The name of the output path 
-            boundary (:obj:4-tuple of int): a 4-tuple of integer values 
-            that represent the boundary box of the screenshot
     """
-    def __init__(self,imageCount,boxtype,OS="linux",fileName="Screenshot",path="./Screenshots"):
-        self.__imageCount = imageCount
+
+    @staticmethod
+    def grabScreen():
+        return ImageGrab.grab()
+
+    @staticmethod
+    def getResolution():
+        screenBoundary = ImageScraper.grabScreen().getbbox()
+        return str(screenBoundary[2]) + "x" + str(screenBoundary[3])
+
+    def __init__(self,boxtype,OS="linux",fileName="Screenshot",path="./Screenshots"):
         self.__boxtype = boxtype
         self.__OS = OS
         self.__fileName = fileName
@@ -37,22 +46,6 @@ class ImageScraper(object):
             except:
                 raise ValueError("The input path is not a syntactically valid path")
         
-    @property
-    def imageCount(self):
-        # imageCount (int): the amount of images that should be taken 
-        return self.__imageCount
-
-    @imageCount.setter
-    def imageCount(self,imageCount):
-        if(not isinstance(imageCount,int)):
-            try:
-                self.__imageCount = int(imageCount)
-            except:
-                raise ValueError("The input for the amount of images is not convertable to an integer.")
-        if(imageCount > 1000):
-            raise ValueError("Image Count is too high please chose a smaller amount of images to scrape.")
-        self.__imageCount = imageCount
-
     @property
     def fileName(self):
         #fileName (str): The name of the output file
@@ -141,7 +134,7 @@ class ImageScraper(object):
             raise ValueError("Could not find boundary in the box-sizes.cfg file")
         return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
 
-    def takeScreenshots(self):
+    def takeScreenshots(self,screenshotAmount):
         """
             Returns:
                 screenshots (list of 2-tuple of (str,Image)): a list of 2-tuples
@@ -154,7 +147,7 @@ class ImageScraper(object):
         """
         latestScreenshot = self.__getLatestScreenshot(self.path)
         screenshot = [] 
-        for i in range(self.__imageCount):
+        for i in range(screenshotAmount):
             screenshotNum = str(i+latestScreenshot)
             if(self.__boundary != ()):
                 image = ImageGrab.grab(self.boundary)
@@ -186,15 +179,6 @@ class ImageScraper(object):
         
     def grabScreenRegion(self):
         return ImageGrab.grab(self.boundary) 
-
-    @staticmethod
-    def grabScreen():
-        return ImageGrab.grab()
-
-    @staticmethod
-    def getResolution():
-        screenBoundary = ImageScraper.grabScreen().getbbox()
-        return str(screenBoundary[2]) + "x" + str(screenBoundary[3])
 
 if __name__ == '__main__':
     print("hello world")

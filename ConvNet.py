@@ -3,8 +3,7 @@
     which will be used to establish what type of box is being.
     This class inherit from the keras.Sequential model and also 
     has functions which process and regularize the images
-
-    @author Ian Gomez imgomez0127@github
+@author Ian Gomez imgomez0127@github
 """
 from functools import reduce
 import os
@@ -12,12 +11,12 @@ import time
 import numpy as np
 import pandas
 from PIL import Image
-import pyscreenshot as ImageGrab
 from sklearn.model_selection import train_test_split
 from tensorflow import keras,convert_to_tensor
 from tensorflow import shape as tfshape
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization,Input
 from ImageProcessor import ImageProcessor 
+from ImageScraper import ImageScraper
 
 class ConvNet(keras.Sequential):
     def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
@@ -25,10 +24,10 @@ class ConvNet(keras.Sequential):
         self.__boxname = boxname
         self.__convLayerAmt = convLayerAmt 
         self.__denseLayersAmt = denseLayersAmt
-        self.__filePath = "./" + self.__boxname + "Examples"
+        self.__filePath = "./" + self.__boxname + "Examples" 
         self.__imageLabels = self.__classifyImages()
         self.__images = self.__processImages()
-        self.__imageShape = len(self.__images[0])
+        self.__imageShape = self.__images[0].shape
         self.__kernelSize = 3
         self.__kernelChannels = 3
         self.__poolingSize = 2
@@ -160,7 +159,8 @@ class ConvNet(keras.Sequential):
         pass
 
     def BuildConvNet(self):
-        Input(shape=self.__images[0].shape)
+        self.add(Input(shape=self.__imageShape))
+        self.add(Reshape(self.__imageShape))
         for i in range(self.__convLayerAmt):
             self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
                              padding="Valid"))
@@ -174,18 +174,20 @@ class ConvNet(keras.Sequential):
     def save(self):
         super().save(self.modelPath)
 
-    def grabRegionAsTensor(): 
-         
+    def grabRegionAsTensor(self,OS): 
+        scraper = ImageScraper(self.__boxname,OS)
+        return ImageProcessor.toImageTensor(scraper.grabScreenRegion())
+
     def load_weights(self):
-        if(not os.exists(self.modelPath)):
+        if(not os.path.exists(self.modelPath)):
             raise OSError("The model does not exist") 
-        super.load_weights(self.modelPath)
+        super().load_weights(self.modelPath)
     
-    def __regularizeImages(self,images):
+    def regularizeImages(self,images):
         return images/255
 
     def train(self):
-        trainingImages = self.__regularizeImages(self.__images)
+        trainingImages = self.regularizeImages(self.__images)
         trainingLabels = self.__imageLabels 
         self.compile(optimizer = keras.optimizers.Adam(lr=.001),
                     loss="binary_crossentropy",metrics=["accuracy"])
@@ -195,9 +197,15 @@ class ConvNet(keras.Sequential):
 if __name__ == "__main__": 
     testModel = ConvNet("autobox",2,5)
     testModel.BuildConvNet()
-    testModel.train()
+    if(not os.path.exists(testModel.modelPath)):
+        testModel.train()
+        testModel.save()
+    else:
+        print(len(testModel.layers))
+        testModel.load_weights()
     predictions = testModel.predict(testModel.images)
     print(predictions)
     print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == np.asarray(testModel.imageLabels)))
     print(testModel.imageLabels)
     testModel.summary()
+

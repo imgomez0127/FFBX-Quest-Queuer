@@ -91,15 +91,15 @@ Please Input a choice : """
         """
         fileName = boxtype + ("Pos" if (PosExample) else "Neg")
         path = boxtype + "Examples"
-        imageScraper = ImageScraper(self.__timeFrame,boxtype,self.__OS,fileName,path)
-        screenshots = imageScraper.takeScreenshots()
+        imageScraper = ImageScraper(boxtype,self.__OS,fileName,path)
+        screenshots = imageScraper.takeScreenshots(self.__timeFrame)
         imageScraper.saveScreenshots(screenshots) 
 
     def gatherCategoricalScreenshots(self,categoryNum,boxtype):
         fileName = boxType + str(categoryNum) + "Class"
         path = boxtype + "Examples"
-        imageScraper = ImageScraper(self.__timeFrame,boxtype,self.__OS,fileName,path,boundary)
-        screenshots = imageScraper.takeScreenshots()
+        imageScraper = ImageScraper(boxtype,self.__OS,fileName,path,boundary)
+        screenshots = imageScraper.takeScreenshots(self.__timeFrame)
         imageScraper.saveScreenshots(screenshots)
 
 
