@@ -100,14 +100,14 @@ class ImageProcessor(object):
 
     def __getHighestCategoryNumber(self,fileLst):
         numberRegex = re.compile("[0-9]+")
-        maxNum = float("-inf")
+        highestCategory = float("-inf")
         for fileName in fileLst:
             matchedLst = numberRegex.findall(fileName)
             if(len(matchedLst) != 2):
                 message = "File %s is not formatted in [A-Za-z]+[0-9]+[A-Za-z]+[0-9]+"
                 raise ValueError(message%fileName)
-            maxNum = int(matchedLst[0]) if (int(matchedLst[0]) > maxNum) else maxNum
-        return maxNum
+            highestCategory = max(int(matchedLst[1]),highestCategory)
+        return highestCategory
 
     def classifyCategoricalImages(self):
         numberRegex = re.compile("[0-9]+")

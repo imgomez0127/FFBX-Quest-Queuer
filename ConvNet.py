@@ -21,124 +21,124 @@ from ImageScraper import ImageScraper
 class ConvNet(keras.Sequential):
     def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
         super().__init__()
-        self.__boxname = boxname
-        self.__convLayerAmt = convLayerAmt 
-        self.__denseLayersAmt = denseLayersAmt
-        self.__filePath = "./" + self.__boxname + "Examples" 
-        self.__imageLabels = self.__classifyImages()
-        self.__images = self.__processImages() 
-        self.__imageShape = self.__images[0].shape
-        self.__kernelSize = 3
-        self.__kernelChannels = 3
-        self.__poolingSize = 2
+        self._boxname = boxname
+        self._convLayerAmt = convLayerAmt 
+        self._denseLayersAmt = denseLayersAmt
+        self._filePath = "./" + self._boxname + "Examples" 
+        self._imageLabels = self.__classifyImages()
+        self._images = self._processImages() 
+        self._imageShape = self._images[0].shape
+        self._kernelSize = 3
+        self._kernelChannels = 3
+        self._poolingSize = 2
         if(not os.path.isdir(modelDir)):
             raise OSError("The input directory " + str(newDir) +" directory does not exist")
-        self.__modelDir = modelDir
+        self._modelDir = modelDir
 
     @property
     def boxname(self):
         #Name of the box which the ConvNet will predict for
-        return self.__boxname
+        return self._boxname
     
     @property
     def convLayerAmt(self):
         #Amount of Convolution Layers
-        return self.__convLayerAmt
+        return self._convLayerAmt
 
     @convLayerAmt.setter
     def convLayerAmt(self,convLayerAmt):
         if(type(convLayerAmt) != int):
             raise ValueError("ConvLayerAmt is not of type int")
-        self.__convLayerAmt = convLayerAmt
+        self._convLayerAmt = convLayerAmt
     
     @property
     def denseLayersAmt(self):
         #Amount of Dense Layers
-        return self.__denseLayersAmt
+        return self._denseLayersAmt
     
     @denseLayersAmt.setter
     def denseLayersAmt(self,denseLayersAmt):
-        self.__denseLayersAmt = denseLayersAmt
+        self._denseLayersAmt = denseLayersAmt
     
     @property
     def imageShape(self):
-        return self.__imageShape
+        return self._imageShape
     
     @imageShape.setter
     def imageShape(self,imageShape):
-        self.__imageShape = imageShape 
+        self._imageShape = imageShape 
 
     @property
     def filePath(self):
         #File path for the images
-        return self.__filePath
+        return self._filePath
     
     @property
     def images(self):
         #A numpy array of images
-        return self.__images    
+        return self._images    
 
     @property
     def kernelSize(self):
         #Size of the convolutional kernel
-        return self.__kernelSize
+        return self._kernelSize
     
     @kernelSize.setter
     def kernelSize(self,kernelSize):
         if(type(kernelSize) != int):
             raise ValueError("The input kernelSize is not an int") 
-        self.__kernelSize == kernelSize
+        self._kernelSize == kernelSize
     
     @property
     def kernelChannels(self):
         #The amount of kernels that will be run over the image per convolutional layer
-        return self.__kernelChannels
+        return self._kernelChannels
     
     @kernelChannels.setter
     def kernelChannels(self,kernelChannels):
         if(type(kernelChannels) != int):
             raise ValueError("The inputted kernelChannels is not of type int")
-        self.__kernelChannels = kernelChannels
+        self._kernelChannels = kernelChannels
 
     @property
     def poolingSize(self):
-        return self.__poolingSize
+        return self._poolingSize
     
     @poolingSize.setter
     def poolingSize(self,poolingSize):
         if(type(poolingSize) != int):
             raise ValueError("The inputted poolingSize is not of type int")
-        self.__poolingSize = poolingSize
+        self._poolingSize = poolingSize
 
     @property
     def imageLabels(self):
-        return self.__imageLabels
+        return self._imageLabels
 
     @property
     def modelDir(self):
         #Directory for the model
-        return self.__modelDir
+        return self._modelDir
 
     @modelDir.setter
     def modelDir(self,newDir):
         if(not os.path.isdir(newDir)):
             raise OSError("The input directory " + str(newDir) +
                             " directory does not exist")
-        self.__modelDir = newDir
+        self._modelDir = newDir
 
     @property
     def modelPath(self):
         #Path of the model h5 file
         return self.modelDir+self.boxname+".h5" 
 
-    def __processImages(self):
+    def _processImages(self):
         """
             Returns:
                 processedImages(np.array[float64]): Array of images represented as matrices
             This function processes and returns the images in the folder 
-            that holds the examples for the box specified by self.__boxname
+            that holds the examples for the box specified by self._boxname
         """
-        processor = ImageProcessor(self.__filePath)     
+        processor = ImageProcessor(self._filePath)     
         processedImages = processor.processFolderImages()
         if(len(processedImages) == 0):
             raise ValueError("There are no images in that folder")
@@ -147,26 +147,25 @@ class ConvNet(keras.Sequential):
     def __classifyImages(self):
         """
             This function classifies the images in the folder that 
-            holds the examples for the box specifed by self.__boxname
+            holds the examples for the box specifed by self._boxname
         """
-        processor = ImageProcessor(self.__filePath)
+        processor = ImageProcessor(self._filePath)
         labels = processor.classifyImages()
         if(len(labels) == 0):
             raise ValueError("There are no images in that folder")
-
         return labels
 
-    def __computeFlattenSize(self):
+    def _computeFlattenSize(self):
         pass
 
     def BuildConvNet(self):
-        self.add(Input(shape=self.__imageShape))
-        for i in range(self.__convLayerAmt):
-            self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
+        self.add(Input(shape=self._imageShape))
+        for i in range(self._convLayerAmt):
+            self.add(Conv2D(self._kernelChannels,self._kernelSize,
                              padding="Valid"))
-            self.add(MaxPooling2D(self.__poolingSize))
+            self.add(MaxPooling2D(self._poolingSize))
         self.add(Flatten())
-        for i in range(self.__denseLayersAmt):
+        for i in range(self._denseLayersAmt):
             self.add(Dense(100,activation = "relu", use_bias=True))
         self.add(Dense(1,activation="sigmoid"))
         return self.layers
@@ -175,7 +174,7 @@ class ConvNet(keras.Sequential):
         super().save(self.modelPath)
 
     def grabRegionAsTensor(self,OS): 
-        scraper = ImageScraper(self.__boxname,OS)
+        scraper = ImageScraper(self._boxname,OS)
         return ImageProcessor.toImageTensor(scraper.grabScreenRegion())
 
     def load_weights(self):
@@ -187,8 +186,8 @@ class ConvNet(keras.Sequential):
         return images/255
 
     def train(self):
-        trainingImages = self.regularizeImages(self.__images)
-        trainingLabels = self.__imageLabels 
+        trainingImages = self.regularizeImages(self._images)
+        trainingLabels = self._imageLabels 
         self.compile(
             optimizer = keras.optimizers.Adam(lr=.001),
             loss="binary_crossentropy",metrics=["accuracy"]

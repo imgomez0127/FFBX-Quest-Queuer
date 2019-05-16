@@ -13,49 +13,44 @@ from ConvNet import ConvNet
 
 class CategoricalConvNet(ConvNet):
     def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
-        super().__init__(boxname,convLayerAmt,denseLayersAmt,modelDir)
+        super(CategoricalConvNet,self).__init__(boxname,convLayerAmt,denseLayersAmt,modelDir)
+        self._imageLabels = self.__classifyImages()
 
-    def __processImages(self):
-        processor = ImageProcessor(self.__filePath)
-        processedImages = processor.processFolderImages()
-        if(len(processedImages) == 0):
+
+    def __classifyImages(self):
+        processor = ImageProcessor(self._filePath)
+        image_labels = processor.classifyCategoricalImages()
+        if(len(image_labels) == 0):
             raise ValueError("There are no images in that folder")
-        self.__imageLabels = processor.classifyCategoricalImages()
-        self.__imageShape = processedImages[0].shape
-        return processedImages
-
-    def __computeFlattenSize(self):
-        pass
+        return image_labels
 
     def BuildConvNet(self):
-        self.add(Input(shape=self.__imageShape))
-        for i in range(self.__convLayerAmt):
-            self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
+        self.add(Input(shape=self._imageShape))
+        for i in range(self._convLayerAmt):
+            self.add(Conv2D(self._kernelChannels,self._kernelSize,
                              padding="Valid"))
-            self.add(MaxPooling2D(self.__poolingSize))
+            self.add(MaxPooling2D(self._poolingSize))
         self.add(Flatten())
-        for i in range(self.__denseLayersAmt):
+        for i in range(self._denseLayersAmt):
             self.add(Dense(100,activation = "relu", use_bias=True))
-        self.add(Dense(len(self.__imageLabels[0]),activation="softmax"))
+        self.add(Dense(len(self._imageLabels[0]),activation="softmax"))
         return self.layers
 
-    def __regularizeImages(self,images):
-        return images/255
-
     def train(self):
-        trainingImages = self.__regularizeImages(self.__images)
-        trainingLabels = self.__imageLabels 
+        trainingImages = self._regularizeImages(self._images)
+        trainingLabels = self._imageLabels 
         self.compile(optimizer = keras.optimizers.Adam(lr=.001),
                     loss="categorical_crossentropy",metrics=["accuracy"])
         self.fit(trainingImages,trainingLabels,epochs=100,
                 batch_size=trainingLabels.shape[0],validation_split=0.2)
         
 if __name__ == "__main__": 
-    testModel = ConvNet("screenbox",2,5)
-    testModel.BuildConvNet()
-    testModel.train()
-    predictions = testModel.predict(testModel.images)
-    print(predictions)
-    print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == testModel.imageLabels))
-    print(testModel.imageLabels)
-    testModel.summary()
+    test_model = CategoricalConvNet("screenbox",2,5)
+    print(np.asarray(test_model.imageLabels))
+#   test_model.BuildConvNet()
+#   test_model.train()
+#   predictions = test_model.predict(test_model.images)
+#   print(predictions)
+#   print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == test_model.imageLabels))
+#   print(test_model.imageLabels)
+#   test_model.summary()
