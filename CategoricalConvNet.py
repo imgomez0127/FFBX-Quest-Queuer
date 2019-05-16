@@ -13,7 +13,7 @@ from ConvNet import ConvNet
 
 class CategoricalConvNet(ConvNet):
     def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
-        super(CategoricalConvNet,self).__init__(boxname,convLayerAmt,denseLayersAmt,modelDir)
+        super().__init__(boxname,convLayerAmt,denseLayersAmt,modelDir)
         self._imageLabels = self.__classifyImages()
 
 
