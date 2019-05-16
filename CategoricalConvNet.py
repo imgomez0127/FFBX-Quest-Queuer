@@ -9,107 +9,11 @@ from sklearn.model_selection import train_test_split
 from tensorflow import keras
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization
 from ImageProcessor import ImageProcessor 
+from ConvNet import ConvNet
 
-class ConvNet(keras.Sequential):
+class CategoricalConvNet(ConvNet):
     def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
-        super().__init__()
-        self.__boxname = boxname
-        self.__convLayerAmt = convLayerAmt 
-        self.__denseLayersAmt = denseLayersAmt
-        self.__imageShape = None
-        self.__filePath = "./" + self.__boxname + "Examples"
-        self.__imageLabels = []
-        self.__images = self.__processImages()
-        self.__kernelSize = 3
-        self.__kernelChannels = 3
-        self.__poolingSize = 2
-        if(not os.path.isdir(modelDir)):
-            raise OSError("The input directory " + str(newDir) +" directory does not exist")
-        self.__modelDir = modelDir
-
-    @property
-    def boxname(self):
-        return self.__boxname
-    
-    @property
-    def convLayerAmt(self):
-        return self.__convLayerAmt
-
-    @convLayerAmt.setter
-    def convLayerAmt(self,convLayerAmt):
-        if(type(convLayerAmt) != int):
-            raise ValueError("ConvLayerAmt is not of type int")
-        self.__convLayerAmt = convLayerAmt
-    
-    @property
-    def denseLayersAmt(self):
-        return self.__denseLayersAmt
-    
-    @denseLayersAmt.setter
-    def denseLayersAmt(self,denseLayersAmt):
-        self.__denseLayersAmt = denseLayersAmt
-    
-    @property
-    def imageShape(self):
-        return self.__imageShape
-    
-    @imageShape.setter
-    def imageShape(self,imageShape):
-        self.__imageShape = imageShape 
-
-    @property
-    def filePath(self):
-        return self.__filePath
-    
-    @property
-    def images(self):
-        return self.__images    
-
-    @property
-    def kernelSize(self):
-        return self.__kernelSize
-    
-    @kernelSize.setter
-    def kernelSize(self,kernelSize):
-        if(type(kernelSize) != int):
-            raise ValueError("The input kernelSize is not an int") 
-        self.__kernelSize == kernelSize
-    
-    @property
-    def kernelChannels(self):
-        return self.__kernelChannels
-    
-    @kernelChannels.setter
-    def kernelChannels(self,kernelChannels):
-        if(type(kernelChannels) != int):
-            raise ValueError("The inputted kernelChannels is not of type int")
-        self.__kernelChannels = kernelChannels
-    @property
-    def poolingSize(self):
-        return self.__poolingSize
-    
-    @poolingSize.setter
-    def poolingSize(self,poolingSize):
-        if(type(poolingSize) != int):
-            raise ValueError("The inputted poolingSize is not of type int")
-        self.__poolingSize = poolingSize
-
-    @property
-    def imageLabels(self):
-        return self.__imageLabels
-
-    @property
-    def modelDir(self):
-        return self.__modelDir
-
-    @modelDir.setter
-    def modelDir(self,newDir):
-        if(not os.path.isdir(newDir)):
-            raise OSError("The input directory " + str(newDir) +" directory does not exist")
-        self.__modelDir = newDir
-    @property
-    def modelPath(self):
-        return self.modelDir+self.boxname+".h5" 
+        super().__init__(boxname,convLayerAmt,denseLayersAmt,modelDir)
 
     def __processImages(self):
         processor = ImageProcessor(self.__filePath)
@@ -124,7 +28,7 @@ class ConvNet(keras.Sequential):
         pass
 
     def BuildConvNet(self):
-        self.add(Reshape((60,150,3)))
+        self.add(Input(shape=self.__imageShape))
         for i in range(self.__convLayerAmt):
             self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
                              padding="Valid"))
@@ -135,14 +39,6 @@ class ConvNet(keras.Sequential):
         self.add(Dense(len(self.__imageLabels[0]),activation="softmax"))
         return self.layers
 
-    def save(self):
-        super().save(self.modelPath)
-    
-    def load_weights(self):
-        if(not os.exists(self.modelPath)):
-            raise OSError("The model does not exist") 
-        super.load_weights(self.modelPath)
-    
     def __regularizeImages(self,images):
         return images/255
 

@@ -26,7 +26,7 @@ class ConvNet(keras.Sequential):
         self.__denseLayersAmt = denseLayersAmt
         self.__filePath = "./" + self.__boxname + "Examples" 
         self.__imageLabels = self.__classifyImages()
-        self.__images = self.__processImages()
+        self.__images = self.__processImages() 
         self.__imageShape = self.__images[0].shape
         self.__kernelSize = 3
         self.__kernelChannels = 3
@@ -122,7 +122,8 @@ class ConvNet(keras.Sequential):
     @modelDir.setter
     def modelDir(self,newDir):
         if(not os.path.isdir(newDir)):
-            raise OSError("The input directory " + str(newDir) +" directory does not exist")
+            raise OSError("The input directory " + str(newDir) +
+                            " directory does not exist")
         self.__modelDir = newDir
 
     @property
@@ -134,8 +135,8 @@ class ConvNet(keras.Sequential):
         """
             Returns:
                 processedImages(np.array[float64]): Array of images represented as matrices
-            This function processes and returns the images in the folder that holds the examples for the box
-            specified by self.__boxname
+            This function processes and returns the images in the folder 
+            that holds the examples for the box specified by self.__boxname
         """
         processor = ImageProcessor(self.__filePath)     
         processedImages = processor.processFolderImages()
@@ -160,7 +161,6 @@ class ConvNet(keras.Sequential):
 
     def BuildConvNet(self):
         self.add(Input(shape=self.__imageShape))
-        self.add(Reshape(self.__imageShape))
         for i in range(self.__convLayerAmt):
             self.add(Conv2D(self.__kernelChannels,self.__kernelSize,
                              padding="Valid"))
@@ -189,10 +189,17 @@ class ConvNet(keras.Sequential):
     def train(self):
         trainingImages = self.regularizeImages(self.__images)
         trainingLabels = self.__imageLabels 
-        self.compile(optimizer = keras.optimizers.Adam(lr=.001),
-                    loss="binary_crossentropy",metrics=["accuracy"])
-        self.fit(trainingImages,trainingLabels,epochs=100,
-                batch_size=trainingLabels.shape[0],validation_split=0.2)
+        self.compile(
+            optimizer = keras.optimizers.Adam(lr=.001),
+            loss="binary_crossentropy",metrics=["accuracy"]
+        )
+        self.fit(
+            trainingImages,
+            trainingLabels,
+            epochs=100,
+            batch_size=trainingLabels.shape[0],
+            validation_split=0.2
+        )
         
 if __name__ == "__main__": 
     testModel = ConvNet("autobox",2,5)
@@ -208,4 +215,3 @@ if __name__ == "__main__":
     print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == np.asarray(testModel.imageLabels)))
     print(testModel.imageLabels)
     testModel.summary()
-
