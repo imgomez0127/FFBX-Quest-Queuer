@@ -3,7 +3,7 @@
     which will be used to feed into the Convolutional Neural Network
 
     Example:
-        $python ImageScraper.py <ImageCount> [fileName] [path] [boundary 1]
+        $python ImageScraper.py <ImageCount> [filePrefix] [path] [boundary 1]
 [boundary 2] [boundary 3] [boundary 4]
 
     @author Ian Gomez imgomez0127@github
@@ -20,7 +20,7 @@ class ImageScraper(object):
             boxtype(str): String that represents what type of 
             image is being taken
             OS(str): The operating system of the current system
-            fileName (str): The name of the output file
+            filePrefix (str): The name of the output file
             path (str): The name of the output path 
     """
 
@@ -33,10 +33,10 @@ class ImageScraper(object):
         screenBoundary = ImageScraper.grabScreen().getbbox()
         return str(screenBoundary[2]) + "x" + str(screenBoundary[3])
 
-    def __init__(self,boxtype,OS="linux",fileName="Screenshot",path="./Screenshots"):
+    def __init__(self,boxtype,OS="linux",filePrefix="Screenshot",path="./Screenshots"):
         self.__boxtype = boxtype
         self.__OS = OS
-        self.__fileName = fileName
+        self.__filePrefix = filePrefix
         self.__path = path
         self.__resolution = self.getResolution()
         self.__boundary = self.findBoundary(boxtype)
@@ -47,13 +47,13 @@ class ImageScraper(object):
                 raise ValueError("The input path is not a syntactically valid path")
         
     @property
-    def fileName(self):
-        #fileName (str): The name of the output file
-        return self.__fileName
+    def filePrefix(self):
+        #filePrefix (str): The name of the output file
+        return self.__filePrefix
 
-    @fileName.setter
-    def fileName(self,fileName):
-        self.__fileName = str(fileName)
+    @filePrefix.setter
+    def filePrefix(self,filePrefix):
+        self.__filePrefix = str(filePrefix)
 
     @property
     def path(self):
@@ -105,11 +105,19 @@ class ImageScraper(object):
     def resolution(self):
         #The screen resolution of the current computer
         return self.__resolution
+    def __getAmountOfImages(self,directory_list):
+        image_regex = re.compile("jpg|png") 
+        image_amount = 0 
+        for image_file in directory_list:
+            if(image_regex.match(image_file) != None):
+                image_amount += 1 
+            
+        return image_amount
 
     def __getLatestScreenshot(self,path):
         regex = re.compile("[0-9]+")
         imgLst = os.listdir(path)
-        if len(imgLst) == 0:
+        if self.__getAmountOfImages(imgLst) == 0:
             return 0
         intLst = [int(regex.findall(im)[0]) for im in imgLst]
         return max(intLst)+1
@@ -134,7 +142,7 @@ class ImageScraper(object):
             raise ValueError("Could not find boundary in the box-sizes.cfg file")
         return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
 
-    def takeScreenshots(self,screenshotAmount):
+    def takeScreenshots(self,screenshotAmount,category=""):
         """
             Returns:
                 screenshots (list of 2-tuple of (str,Image)): a list of 2-tuples
@@ -159,9 +167,10 @@ class ImageScraper(object):
             if(self.__path[1] != "/"):
                 filePath += "/"
             if(self.__path[-1] == "/"):
-                filePath += self.path + self.fileName + screenshotNum + ".jpg"
+                filePath += self.path + self.filePrefix + screenshotNum + category + ".jpg"
             else:
-                filePath += self.path +'/' + self.__fileName + screenshotNum + ".jpg"
+                filePath += self.path +'/' + self.__filePrefix + \
+                            screenshotNum + category + ".jpg"
             screenshot.append((filePath,image))
         return screenshot
 

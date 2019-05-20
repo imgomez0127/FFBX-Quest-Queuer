@@ -2,7 +2,7 @@ from time import sleep
 from tensorflow import reshape
 from ConvNet import ConvNet
 from CategoricalConvNet import CategoricalConvNet
-
+from numpy import argmax
 if __name__ == "__main__":
     screenNet = CategoricalConvNet("screenbox",5,10)
     screenNet.BuildConvNet()

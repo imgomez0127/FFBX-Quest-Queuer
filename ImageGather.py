@@ -55,15 +55,17 @@ N - Fetch Next Box Pictures
 C - Fetch Companion Box Pictures
 D - Fetch Depart Box Pictures
 R - Fetch Request Box Pictures
+X - Fetch Screen Box Pictures
 S - Set Positive Example Flag
 Please Input a choice : """
-            choices = ['a','q','n','c','d','r','s']
+            choices = {'a','q','n','c','d','r','x','s'}
             boxtype = {'a':"autobox",
                        'q':"questbox",
                        'n':"nextbox",
                        'c':"companionbox",
                        'd':"departbox",
-                       'r':"requestbox"}
+                       'r':"requestbox",
+                       'x':"screenbox"}
             screenshotType = input(menu).lower()
             while(screenshotType not in choices):
                 print("This is not a valid choce \n\n") 
@@ -71,6 +73,8 @@ Please Input a choice : """
             if(screenshotType == 's'):
                 PosExample = True if(input("Set flag to [T/F]: ").lower() == "t") \
                 else False  
+            elif(screenshotType == "x"):
+                self.gatherCategoricalScreenshots(boxtype[screenshotType])
             elif(screenshotType in choices):
                 self.gatherScreenshots(PosExample,boxtype[screenshotType])
             else:
@@ -95,11 +99,18 @@ Please Input a choice : """
         screenshots = imageScraper.takeScreenshots(self.__timeFrame)
         imageScraper.saveScreenshots(screenshots) 
 
-    def gatherCategoricalScreenshots(self,categoryNum,boxtype):
-        fileName = boxType + str(categoryNum) + "Class"
+    def gatherCategoricalScreenshots(self,boxtype):
+        try:
+            category_num = int(input("Input the category number: "))
+        except ValueError:
+            print("You did not input a number")
+            return
+        filePrefix = boxtype
         path = boxtype + "Examples"
-        imageScraper = ImageScraper(boxtype,self.__OS,fileName,path,boundary)
-        screenshots = imageScraper.takeScreenshots(self.__timeFrame)
+        imageScraper = ImageScraper(boxtype,self.__OS,filePrefix,path)
+        screenshots = imageScraper.takeScreenshots(
+                        self.__timeFrame,
+                        category="Category" + str(category_num))
         imageScraper.saveScreenshots(screenshots)
 
 
