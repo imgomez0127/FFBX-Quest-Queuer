@@ -45,7 +45,7 @@ class CategoricalConvNet(ConvNet):
                 batch_size=trainingLabels.shape[0],validation_split=0.2)
         
 if __name__ == "__main__": 
-    test_model = CategoricalConvNet("screenbox",2,5)
+    test_model = CategoricalConvNet("screenbox",5,10)
     print(np.asarray(test_model.imageLabels))
 #   test_model.BuildConvNet()
 #   test_model.train()

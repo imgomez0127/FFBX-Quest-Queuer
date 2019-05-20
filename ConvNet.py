@@ -201,14 +201,10 @@ class ConvNet(keras.Sequential):
         )
         
 if __name__ == "__main__": 
-    testModel = ConvNet("autobox",2,5)
+    testModel = ConvNet("autobox",3,6)
     testModel.BuildConvNet()
-    if(not os.path.exists(testModel.modelPath)):
-        testModel.train()
-        testModel.save()
-    else:
-        print(len(testModel.layers))
-        testModel.load_weights()
+    testModel.train()
+    testModel.save()
     predictions = testModel.predict(testModel.images)
     print(predictions)
     print(reduce(lambda x,y: x and y,[round(x[0]) for x in predictions] == np.asarray(testModel.imageLabels)))
