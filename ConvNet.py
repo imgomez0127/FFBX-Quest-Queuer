@@ -25,7 +25,7 @@ class ConvNet(keras.Sequential):
         self._convLayerAmt = convLayerAmt 
         self._denseLayersAmt = denseLayersAmt
         self._filePath = "./" + self._boxname + "Examples" 
-        self._imageLabels = self.__classifyImages()
+        self._imageLabels = self._classifyImages()
         self._images = self._processImages() 
         self._imageShape = self._images[0].shape
         self._kernelSize = 3

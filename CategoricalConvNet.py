@@ -14,10 +14,9 @@ from numpy import argmax
 class CategoricalConvNet(ConvNet):
     def __init__(self, boxname, convLayerAmt, denseLayersAmt,modelDir="models/"):
         super().__init__(boxname,convLayerAmt,denseLayersAmt,modelDir)
-        self._imageLabels = self.__classifyImages()
 
 
-    def __classifyImages(self):
+    def _classifyImages(self):
         processor = ImageProcessor(self._filePath)
         image_labels = processor.classifyCategoricalImages()
         if(len(image_labels) == 0):

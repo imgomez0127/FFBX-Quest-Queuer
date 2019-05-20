@@ -70,18 +70,25 @@ class ImageProcessor(object):
         imArr = convert_to_tensor(np.asarray(im,dtype="float64"))
         im.close()
         return imArr    
-    
+    def __filterImages(self,fileLst): 
+        image_regex = re.compile("jpg|png")
+        image_lst = []
+        for file_name in fileLst:
+            if(image_regex.search(file_name)):
+                image_lst.append(file_name)
+        return image_lst
+ 
     def processFolderImages(self):
         """
             This function selects the folderPath memeber variable and 
             turns all images in that file into a numpy array which is storred
             in the member variable processedImages
         """ 
-        fileList = os.listdir(self.__folderPath)
+        imageLst = self.__filterImages(os.listdir(self.__folderPath))
         processedImages = []
-        for fileName in fileList:
+        for imageName in imageLst:
             try:
-                fullImagePath = self.__folderPath + "/" + fileName
+                fullImagePath = self.__folderPath + "/" + imageName
                 imgAsArr = self.__folderImagesToTensor(fullImagePath)
                 processedImages.append(imgAsArr) 
             except OSError:
@@ -92,28 +99,29 @@ class ImageProcessor(object):
     def classifyImages(self):
         regexPos = re.compile("(Pos)+") 
         imageClasses = []
-        fileList = os.listdir(self.__folderPath)
-        for fileName in fileList:
-            imageClasses.append(1 if (regexPos.findall(fileName) != []) else 0)
+        imageLst = self.__filterImages(os.listdir(self.__folderPath))
+        for imageName in imageLst:
+            imageClasses.append(1 if (regexPos.findall(imageName) != []) else 0)
         self.__imageClasses = convert_to_tensor(imageClasses,dtype="float64")
         return self.__imageClasses
 
-    def __getHighestCategoryNumber(self,fileLst):
+    def __getHighestCategoryNumber(self,imageLst):
+        print(imageLst)
         numberRegex = re.compile("[0-9]+")
         highestCategory = float("-inf")
-        for fileName in fileLst:
-            matchedLst = numberRegex.findall(fileName)
+        for imageName in imageLst:
+            matchedLst = numberRegex.findall(imageName)
             if(len(matchedLst) != 2):
                 message = "File %s is not formatted in [A-Za-z]+[0-9]+[A-Za-z]+[0-9]+"
-                raise ValueError(message%fileName)
+                raise ValueError(message%imageName)
             highestCategory = max(int(matchedLst[1]),highestCategory)
         return highestCategory
 
     def classifyCategoricalImages(self):
         numberRegex = re.compile("[0-9]+")
-        fileLst = os.listdir(self.__folderPath)
-        highestCategoryNumber = self.__getHighestCategoryNumber(fileLst)
-        labels = [int(numberRegex.findall(fileName)[0]) for fileName in fileLst]
+        imageLst = self.__filterImages(os.listdir(self.__folderPath))
+        highestCategoryNumber = self.__getHighestCategoryNumber(imageLst)
+        labels = [int(numberRegex.findall(imageName)[0]) for imageName in imageLst]
         return one_hot(labels,highestCategoryNumber+1)
 
 if __name__ == "__main__":

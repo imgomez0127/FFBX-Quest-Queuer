@@ -52,8 +52,8 @@ pycups==1.9.74
 pycurl==7.43.0.2
 PyGObject==3.32.1
 pyparsing==2.4.0
-PyQt5==5.12.1
-PyQt5-sip==4.19.16
+PyQt5==5.12.2
+PyQt5-sip==4.19.17
 pyscreenshot==0.5.1
 python-dateutil==2.8.0
 pytoml==0.1.20
@@ -74,7 +74,7 @@ tensorflow-estimator==1.13.0
 termcolor==1.1.0
 tf-estimator-nightly==1.14.0.dev2019030115
 ufw==0.36
-urllib3==1.24.2
+urllib3==1.25.2
 virtualenv-clone==0.5.1
 webencodings==0.5.1
 Werkzeug==0.14.1
