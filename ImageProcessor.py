@@ -121,7 +121,7 @@ class ImageProcessor(object):
         numberRegex = re.compile("[0-9]+")
         imageLst = self.__filterImages(os.listdir(self.__folderPath))
         highestCategoryNumber = self.__getHighestCategoryNumber(imageLst)
-        labels = [int(numberRegex.findall(imageName)[0]) for imageName in imageLst]
+        labels = [int(numberRegex.findall(imageName)[1]) for imageName in imageLst]
         return one_hot(labels,highestCategoryNumber+1)
 
 if __name__ == "__main__":

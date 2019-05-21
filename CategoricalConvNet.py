@@ -41,8 +41,11 @@ class CategoricalConvNet(ConvNet):
         trainingLabels = self._imageLabels 
         self.compile(optimizer = keras.optimizers.Adam(lr=.001),
                     loss="categorical_crossentropy",metrics=["accuracy"])
-        self.fit(trainingImages,trainingLabels,epochs=100,
-                batch_size=trainingLabels.shape[0])
+        self.fit(
+                trainingImages,
+                trainingLabels,epochs=100,
+                batch_size=trainingLabels.shape[0],
+                validation_split=0.2)
         
 if __name__ == "__main__": 
     test_model = CategoricalConvNet("screenbox",3,10)
