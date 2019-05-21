@@ -1,8 +1,7 @@
 """
     A python class to create the convolutional neural network
     which will be used to establish what type of box is being.
-    This class inherit from the keras.Sequential model and also 
-    has functions which process and regularize the images
+    This class inherit from the keras.Sequential model and also has functions which process and regularize the images
 @author Ian Gomez imgomez0127@github
 """
 from functools import reduce
@@ -15,6 +14,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow import keras,convert_to_tensor
 from tensorflow import shape as tfshape
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization,Input
+from sklearn.utils import shuffle
 from ImageProcessor import ImageProcessor 
 from ImageScraper import ImageScraper
 
@@ -144,7 +144,7 @@ class ConvNet(keras.Sequential):
             raise ValueError("There are no images in that folder")
         return processedImages 
 
-    def __classifyImages(self):
+    def _classifyImages(self):
         """
             This function classifies the images in the folder that 
             holds the examples for the box specifed by self._boxname
@@ -155,9 +155,6 @@ class ConvNet(keras.Sequential):
             raise ValueError("There are no images in that folder")
         return labels
 
-    def _computeFlattenSize(self):
-        pass
-
     def BuildConvNet(self):
         self.add(Input(shape=self._imageShape))
         for i in range(self._convLayerAmt):
@@ -166,10 +163,10 @@ class ConvNet(keras.Sequential):
             self.add(MaxPooling2D(self._poolingSize))
         self.add(Flatten())
         for i in range(self._denseLayersAmt):
-            self.add(Dense(100,activation = "relu", use_bias=True))
+            self.add(Dense(100,activation = "relu",use_bias=True))
         self.add(Dense(1,activation="sigmoid"))
         return self.layers
-
+            
     def save(self):
         super().save(self.modelPath)
 
@@ -187,7 +184,7 @@ class ConvNet(keras.Sequential):
 
     def train(self):
         trainingImages = self.regularizeImages(self._images)
-        trainingLabels = self._imageLabels 
+        trainingLabels = self._imageLabels
         self.compile(
             optimizer = keras.optimizers.Adam(lr=.001),
             loss="binary_crossentropy",metrics=["accuracy"])

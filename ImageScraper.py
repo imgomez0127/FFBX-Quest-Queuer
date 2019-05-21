@@ -109,9 +109,8 @@ class ImageScraper(object):
         image_regex = re.compile("jpg|png") 
         image_amount = 0 
         for image_file in directory_list:
-            if(image_regex.match(image_file) != None):
+            if(image_regex.findall(image_file) != []):
                 image_amount += 1 
-            
         return image_amount
 
     def __getLatestScreenshot(self,path):
@@ -122,6 +121,19 @@ class ImageScraper(object):
         intLst = [int(regex.findall(im)[0]) for im in imgLst]
         return max(intLst)+1
     
+
+    def __getLatestCategoricalScreenshot(self,path,category):
+        regex = re.compile("[0-9]+")
+        imgLst = os.listdir(path)
+        if self.__getAmountOfImages(imgLst) == 0:
+            return 0
+        try:
+            intLst = [int(regex.findall(im)[0]) if(int(regex.findall(im)[1]) == category) else 0 for im in imgLst]
+        except ValueError:
+            message = "Not all files are not formatted in [A-Za-z]+[0-9]+[A-Za-z]+[0-9]+"
+            raise ValueError(message)
+        return max(intLst)+1
+       
     def findBoundary(self,boundaryName):
         """
             Args:   
@@ -142,7 +154,7 @@ class ImageScraper(object):
             raise ValueError("Could not find boundary in the box-sizes.cfg file")
         return tuple([int(boundary) for boundary in bbox.strip().split(" ")])
 
-    def takeScreenshots(self,screenshotAmount,category=""):
+    def takeScreenshots(self,screenshotAmount):
         """
             Returns:
                 screenshots (list of 2-tuple of (str,Image)): a list of 2-tuples
@@ -167,10 +179,44 @@ class ImageScraper(object):
             if(self.__path[1] != "/"):
                 filePath += "/"
             if(self.__path[-1] == "/"):
-                filePath += self.path + self.filePrefix + screenshotNum + category + ".jpg"
+                filePath += self.path + self.filePrefix + screenshotNum + ".jpg"
             else:
                 filePath += self.path +'/' + self.__filePrefix + \
-                            screenshotNum + category + ".jpg"
+                            screenshotNum + ".jpg"
+            screenshot.append((filePath,image))
+        return screenshot
+
+    def takeCategoricalScreenshots(self,screenshotAmount,category):
+        """
+            Returns:
+                screenshots (list of 2-tuple of (str,Image)): a list of 2-tuples
+                where the first item is the screenshot name and the second item
+                is the Image object
+            
+            This function takes screenshots of the given boundary and returns
+            a list of screenshots which are tuples of screenshot names and the 
+            Image object
+        """
+        latestScreenshot = self.__getLatestCategoricalScreenshot(self.path,category)
+        screenshot = [] 
+        categoryStr = "Category" + str(category)
+        for i in range(screenshotAmount):
+            screenshotNum = str(i+latestScreenshot)
+            if(self.__boundary != ()):
+                image = ImageGrab.grab(self.boundary)
+            else:
+                image = ImageGrab.grab()
+            filePath = ""
+            if(self.__path[0] != "."):
+                filePath += "."
+            if(self.__path[1] != "/"):
+                filePath += "/"
+            if(self.__path[-1] == "/"):
+                filePath += self.path + self.filePrefix + screenshotNum\
+                + categoryStr + ".jpg"
+            else:
+                filePath += self.path + '/' + self.__filePrefix + screenshotNum\
+                + categoryStr + ".jpg"
             screenshot.append((filePath,image))
         return screenshot
 

@@ -108,9 +108,9 @@ Please Input a choice : """
         filePrefix = boxtype
         path = boxtype + "Examples"
         imageScraper = ImageScraper(boxtype,self.__OS,filePrefix,path)
-        screenshots = imageScraper.takeScreenshots(
+        screenshots = imageScraper.takeCategoricalScreenshots(
                         self.__timeFrame,
-                        category="Category" + str(category_num))
+                        category_num)
         imageScraper.saveScreenshots(screenshots)
 
 

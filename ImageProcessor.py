@@ -106,7 +106,6 @@ class ImageProcessor(object):
         return self.__imageClasses
 
     def __getHighestCategoryNumber(self,imageLst):
-        print(imageLst)
         numberRegex = re.compile("[0-9]+")
         highestCategory = float("-inf")
         for imageName in imageLst:

@@ -32,7 +32,6 @@ class CategoricalConvNet(ConvNet):
         self.add(Flatten())
         for i in range(self._denseLayersAmt):
             self.add(Dense(100,activation = "relu", use_bias=True))
-        print(len(self._imageLabels[0]))
         self.add(Dense(len(self._imageLabels[0]),activation="softmax"))
         return self.layers
 
@@ -60,3 +59,4 @@ if __name__ == "__main__":
     print(test_model.imageLabels)
     print(argmax(test_model.imageLabels,axis=1))
     test_model.summary()
+    test_model.save()
