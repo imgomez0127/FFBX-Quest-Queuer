@@ -70,6 +70,7 @@ class ImageProcessor(object):
         imArr = convert_to_tensor(np.asarray(im,dtype="float64"))
         im.close()
         return imArr    
+
     def __filterImages(self,fileLst): 
         image_regex = re.compile("jpg|png")
         image_lst = []

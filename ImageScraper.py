@@ -105,6 +105,15 @@ class ImageScraper(object):
     def resolution(self):
         #The screen resolution of the current computer
         return self.__resolution
+
+    def __filterImages(self,fileLst): 
+        image_regex = re.compile("jpg|png")
+        image_lst = []
+        for file_name in fileLst:
+            if(image_regex.search(file_name)):
+                image_lst.append(file_name)
+        return image_lst
+
     def __getAmountOfImages(self,directory_list):
         image_regex = re.compile("jpg|png") 
         image_amount = 0 
@@ -115,7 +124,7 @@ class ImageScraper(object):
 
     def __getLatestScreenshot(self,path):
         regex = re.compile("[0-9]+")
-        imgLst = os.listdir(path)
+        imgLst = self.__filterImages(os.listdir(path))
         if self.__getAmountOfImages(imgLst) == 0:
             return 0
         intLst = [int(regex.findall(im)[0]) for im in imgLst]
@@ -124,15 +133,17 @@ class ImageScraper(object):
 
     def __getLatestCategoricalScreenshot(self,path,category):
         regex = re.compile("[0-9]+")
-        imgLst = os.listdir(path)
+        imgLst = self.__filterImages(os.listdir(path))
         if self.__getAmountOfImages(imgLst) == 0:
             return 0
         try:
             intLst = [int(regex.findall(im)[0]) if(int(regex.findall(im)[1]) == category) else 0 for im in imgLst]
-        except ValueError:
+        except (ValueError,KeyError) as e:
             message = "Not all files are not formatted in [A-Za-z]+[0-9]+[A-Za-z]+[0-9]+"
-            raise ValueError(message)
-        return max(intLst)+1
+            print(e)
+            print(message)
+            sys.exit(0)
+        return max(intLst)+1 if(max(intLst) != 0) else 0
        
     def findBoundary(self,boundaryName):
         """
