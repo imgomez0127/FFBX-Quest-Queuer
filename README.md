@@ -27,4 +27,4 @@ Finally run the main script using
 python main.py
 ```
 Then sit back and gain money
-
+![](ffbx-demo.gif)
