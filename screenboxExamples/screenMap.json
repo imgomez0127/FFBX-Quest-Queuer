@@ -1,5 +1,5 @@
 {
-    "fight_screen":0,
-    "next_screen":1,
-    "request_screen":2
+   "0":"fight_screen",
+    "1":"any_other_screen",
+    "2":"request_screen"
 }
