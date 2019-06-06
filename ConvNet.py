@@ -10,8 +10,7 @@ import time
 import numpy as np
 import pandas
 from PIL import Image
-from sklearn.model_selection import train_test_split
-from tensorflow import keras,convert_to_tensor
+from tensorflow import keras,convert_to_tensor,split,map_fn,stack
 from tensorflow import shape as tfshape
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization,Input
 from sklearn.utils import shuffle
@@ -181,20 +180,26 @@ class ConvNet(keras.Sequential):
     
     def regularizeImages(self,images):
         return images/255
-
     def train(self):
         trainingImages = self.regularizeImages(self._images)
         trainingLabels = self._imageLabels
+        print(trainingImages.shape)
+        imageBatches = split(trainingImages,10)
+        labelBatches = split(trainingLabels,10)
+        print(len(imageBatches))
+        print(imageBatches[0].shape)
         self.compile(
             optimizer = keras.optimizers.Adam(lr=.001),
             loss="binary_crossentropy",metrics=["accuracy"])
-        self.fit(
-            trainingImages,
-            trainingLabels,
-            epochs=100,
-            batch_size=trainingLabels.shape[0],
-            validation_split=0.2)
-        
+        for images,labels in list(zip(imageBatches,labelBatches)):
+            print(images.shape)
+            self.fit(
+                images,
+                labels,
+                epochs=100,
+                batch_size=trainingLabels.shape[0],
+                validation_split=0.2)
+       
 if __name__ == "__main__": 
     testModel = ConvNet("autobox",3,6)
     testModel.BuildConvNet()
