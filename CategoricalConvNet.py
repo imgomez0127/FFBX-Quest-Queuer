@@ -38,13 +38,16 @@ class CategoricalConvNet(ConvNet):
     def train(self):
         trainingImages = self.regularizeImages(self._images)
         trainingLabels = self._imageLabels 
+        imageBatches = np.array_split(trainingImages,ceil(trainingImages.shape[0]/10))
+        labelBatches = np.array_split(trainingLabels,ceil(trainingLabels.shape[0]/10))
         self.compile(optimizer = keras.optimizers.Adam(lr=.001),
                     loss="categorical_crossentropy",metrics=["accuracy"])
-        self.fit(
-                trainingImages,
-                trainingLabels,epochs=100,
-                batch_size=trainingLabels.shape[0],
-                validation_split=0.2)
+        for images,labels in list(zip(imageBatches,labelBatches)):
+            self.fit(
+                    trainingImages,
+                    trainingLabels,epochs=100,
+                    batch_size=trainingLabels.shape[0],
+                    validation_split=0.2)
         
 if __name__ == "__main__": 
     test_model = CategoricalConvNet("screenbox",3,10)

@@ -5,6 +5,7 @@
 @author Ian Gomez imgomez0127@github
 """
 from functools import reduce
+from math import ceil
 import os
 import time
 import numpy as np
@@ -12,6 +13,7 @@ import pandas
 from PIL import Image
 from tensorflow import keras,convert_to_tensor,split,map_fn,stack
 from tensorflow import shape as tfshape
+from tensorflow.data import Dataset
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten,Reshape,BatchNormalization,Input
 from sklearn.utils import shuffle
 from ImageProcessor import ImageProcessor 
@@ -180,19 +182,16 @@ class ConvNet(keras.Sequential):
     
     def regularizeImages(self,images):
         return images/255
+
     def train(self):
-        trainingImages = self.regularizeImages(self._images)
-        trainingLabels = self._imageLabels
-        print(trainingImages.shape)
-        imageBatches = split(trainingImages,10)
-        labelBatches = split(trainingLabels,10)
-        print(len(imageBatches))
-        print(imageBatches[0].shape)
+        trainingImages = np.asarray(self.regularizeImages(self._images))
+        trainingLabels = np.asarray(self._imageLabels)
+        imageBatches = np.array_split(trainingImages,ceil(trainingImages.shape[0]/10))
+        labelBatches = np.array_split(trainingLabels,ceil(trainingLabels.shape[0]/10))
         self.compile(
             optimizer = keras.optimizers.Adam(lr=.001),
             loss="binary_crossentropy",metrics=["accuracy"])
         for images,labels in list(zip(imageBatches,labelBatches)):
-            print(images.shape)
             self.fit(
                 images,
                 labels,
