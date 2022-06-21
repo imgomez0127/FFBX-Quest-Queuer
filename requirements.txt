@@ -42,7 +42,7 @@ matplotlib==2.2.3
 mock==2.0.0
 msgpack==0.6.1
 npyscreen==4.10.5
-numpy==1.16.1
+numpy==1.22.0
 packaging==19.0
 pacman-mirrors==4.14.2
 pandas==0.23.4
